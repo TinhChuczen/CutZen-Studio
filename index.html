@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CutZen Studio - Cắt Ghép, Lồng Tiếng & Làm Đẹp Video Toàn Cầu</title>
+  <title>CutZen Studio - Global Video Editor & Voiceover</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
     body { margin: 0; background: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; padding: 15px; min-height: 100vh; }
     .header { width: 100%; max-width: 1050px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+    .title-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     h1 { color: #38bdf8; margin: 0; font-size: 24px; }
     .badge { background: #10b981; color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+    .lang-btn { background: #334155; color: #f8fafc; border: 1px solid #38bdf8; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
+    .lang-btn:hover { background: #0284c7; }
     .container { max-width: 1050px; width: 100%; background: #1e293b; padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     .upload-box { border: 2px dashed #38bdf8; padding: 25px; text-align: center; border-radius: 12px; cursor: pointer; margin-bottom: 20px; background: #0f172a; transition: 0.2s; }
     .upload-box:hover { background: #172554; }
@@ -27,21 +30,24 @@
     .btn-quick { background: #334155; color: #38bdf8; border: 1px solid #475569; padding: 6px; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%; margin-top: 6px; }
     button.primary { background: #0284c7; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; }
     button.record { background: #e11d48; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; }
-    button:disabled { background: #475569; cursor: not-allowed; }
-    #status { text-align: center; margin-top: 10px; color: #fbbf24; font-size: 14px; font-weight: bold; }
-    .footer { max-width: 1050px; width: 100%; text-align: center; margin-top: 20px; font-size: 12px; color: #64748b; line-height: 1.5; }
+    button:disabled { background: #475569; cursor: not-allowed; }#status { text-align: center; margin-top: 10px; color: #fbbf24; font-size: 14px; font-weight: bold; }
+    .footer { max-width: 1050px; width: 100%; text-align: center; margin-top: 25px; font-size: 12px; color: #94a3b8; line-height: 1.6; padding-bottom: 20px; }
   </style>
 </head>
 <body>
 
-  <<h1>🎬 CutZen Studio</h1>
-    <span class="badge">Hỗ trợ Video Dài Nhiều Giờ • Toàn Cầu</span>
+  <div class="header">
+    <div class="title-group">
+      <h1>🎬 CutZen Studio</h1>
+      <span class="badge" id="t-badge">Hỗ trợ Video Dài Nhiều Giờ • Toàn Cầu</span>
+    </div>
+    <button class="lang-btn" id="langToggle" onclick="toggleLanguage()">🌐 English</button>
   </div>
 
   <div class="container">
     <div class="upload-box" onclick="document.getElementById('videoInput').click()">
-      <strong>📁 Bấm chọn video từ điện thoại hoặc máy tính (Hỗ trợ file dung lượng lớn)</strong>
-      <p style="font-size: 12px; color: #94a3b8; margin: 5px 0 0 0;">Xử lý trực tiếp trên thiết bị • Bảo mật 100% • Không lưu trữ đám mây</p>
+      <strong id="t-upload-title">📁 Bấm chọn video từ điện thoại hoặc máy tính (Hỗ trợ file dung lượng lớn)</strong>
+      <p id="t-upload-sub" style="font-size: 12px; color: #94a3b8; margin: 5px 0 0 0;">Xử lý trực tiếp trên thiết bị • Bảo mật 100% • Không lưu trữ đám mây</p>
       <input type="file" id="videoInput" accept="video/*" style="display: none;">
     </div>
 
@@ -54,36 +60,35 @@
 
       <div class="controls">
         <div class="group">
-          <h3>✂️ 1. Cắt đoạn video (Giờ : Phút : Giây)</h3>
+          <h3 id="t-sec1">✂️ 1. Cắt đoạn video (Giờ : Phút : Giây)</h3>
           <div class="row">
             <div>
-              <label>Bắt đầu (VD: 00:00:00):</label>
+              <label id="t-start">Bắt đầu (VD: 00:00:00):</label>
               <input type="text" id="startTime" value="00:00:00">
-              <button class="btn-quick" onclick="setMarker('start')">📍 Lấy mốc đang phát</button>
+              <button class="btn-quick" id="t-mark1" onclick="setMarker('start')">📍 Lấy mốc đang phát</button>
             </div>
             <div>
-              <label>Kết thúc (VD: 01:30:00):</label>
+              <label id="t-end">Kết thúc (VD: 01:30:00):</label>
               <input type="text" id="endTime" value="00:00:10">
-              <button class="btn-quick" onclick="setMarker('end')">📍 Lấy mốc đang phát</button>
+              <button class="btn-quick" id="t-mark2" onclick="setMarker('end')">📍 Lấy mốc đang phát</button>
             </div>
           </div>
         </div>
 
         <div class="group">
-          <h3>🎨 2. Chỉnh màu & Làm đẹp hình ảnh</h3>
-          <label>Độ sáng: <span id="valBright">100%</span></label>
+          <h3 id="t-sec2">🎨 2. Chỉnh màu & Làm đẹp hình ảnh</h3>
+          <label><span id="t-bright">Độ sáng:</span> <span id="valBright">100%</span></label>
           <input type="range" id="brightness" min="50" max="150" value="100">
-          <label>Độ sắc nét (Tương phản): <span id="valContrast">100%</span></label>
+          <label><span id="t-contrast">Độ sắc nét (Tương phản):</span> <span id="valContrast">100%</span></label>
           <input type="range" id="contrast" min="50" max="150" value="100">
-          <label>Độ tươi màu: <span id="valSaturate">100%</span></label>
+          <label><span id="t-saturate">Độ tươi màu:</span> <span id="valSaturate">100%</span></label>
           <input type="range" id="saturate" min="0" max="200" value="100">
         </div>
 
         <div class="group" style="border: none;">
-          <h3>🎙️ 3. Chỉnh giọng nói & Lồng tiếng</h3>
-          <label>Âm lượng gốc: <span id="valVol">100%</span></label>
+          <h3 id="t-sec3">🎙️ 3. Chỉnh giọng nói & Lồng tiếng</h3><label><span id="t-vol">Âm lượng gốc:</span> <span id="valVol">100%</span></label>
           <input type="range" id="volume" min="0" max="200" value="100">
-          <label>Tông giọng & Tốc độ: <span id="valPitch">1.0x (Chuẩn)</span></label>
+          <label><span id="t-pitch">Tông giọng & Tốc độ:</span> <span id="valPitch">1.0x</span></label>
           <input type="range" id="pitch" min="0.7" max="1.5" step="0.05" value="1.0">
           <button class="record" id="voiceOverBtn">🎤 Bắt đầu ghi âm lồng tiếng</button>
           <audio id="voiceAudio" style="display:none;"></audio>
@@ -94,11 +99,82 @@
     </div>
   </div>
 
-  <div class="footer">div class="header">© 2026 CutZen Studio. Công cụ xử lý video trực tiếp trên thiết bị người dùng.<br>
+  <div class="footer" id="t-footer">
+    © 2026 CutZen Studio. Công cụ xử lý video trực tiếp trên thiết bị người dùng.<br>
     Điều khoản & Pháp lý: Người dùng tự chịu trách nhiệm về bản quyền nội dung, hình ảnh, âm thanh sử dụng và cam kết tuân thủ quy định pháp luật hiện hành.
   </div>
 
   <script>
+    let currentLang = 'vi';
+    const texts = {
+      vi: {
+        btn: '🌐 English',
+        badge: 'Hỗ trợ Video Dài Nhiều Giờ • Toàn Cầu',
+        upTitle: '📁 Bấm chọn video từ điện thoại hoặc máy tính (Hỗ trợ file dung lượng lớn)',
+        upSub: 'Xử lý trực tiếp trên thiết bị • Bảo mật 100% • Không lưu trữ đám mây',
+        sec1: '✂️ 1. Cắt đoạn video (Giờ : Phút : Giây)',
+        start: 'Bắt đầu (VD: 00:00:00):',
+        end: 'Kết thúc (VD: 01:30:00):',
+        mark: '📍 Lấy mốc đang phát',
+        sec2: '🎨 2. Chỉnh màu & Làm đẹp hình ảnh',
+        bright: 'Độ sáng:',
+        contrast: 'Độ sắc nét (Tương phản):',
+        saturate: 'Độ tươi màu:',
+        sec3: '🎙️ 3. Chỉnh giọng nói & Lồng tiếng',
+        vol: 'Âm lượng gốc:',
+        pitch: 'Tông giọng & Tốc độ:',
+        recStart: '🎤 Bắt đầu ghi âm lồng tiếng',
+        recStop: '⏹️ Dừng ghi âm',
+        recAgain: '🎤 Ghi âm lại lồng tiếng',
+        export: '⬇️ Xuất & Lưu Video Hoàn Chỉnh',
+        footer: '© 2026 CutZen Studio. Công cụ xử lý video trực tiếp trên thiết bị người dùng.<br>Điều khoản & Pháp lý: Người dùng tự chịu trách nhiệm về bản quyền nội dung, hình ảnh, âm thanh sử dụng và cam kết tuân thủ quy định pháp luật hiện hành.'
+      },
+      en: {
+        btn: '🌐 Tiếng Việt',
+        badge: 'Multi-Hour Video Support • Global',
+        upTitle: '📁 Click to select video from phone or PC (Large files supported)',
+        upSub: '100% Client-Side Processing • Private & Secure • No Cloud Upload',
+        sec1: '✂️ 1. Trim Video (Hour : Min : Sec)',
+        start: 'Start Time (e.g. 00:00:00):',
+        end: 'End Time (e.g. 01:30:00):',mark: '📍 Set Current Time',
+        sec2: '🎨 2. Color Grading & Video Enhance',
+        bright: 'Brightness:',
+        contrast: 'Contrast (Sharpness):',
+        saturate: 'Saturation:',
+        sec3: '🎙️ 3. Voice Changer & Voiceover',
+        vol: 'Original Volume:',
+        pitch: 'Voice Pitch & Speed:',
+        recStart: '🎤 Start Voiceover Recording',
+        recStop: '⏹️ Stop Recording',
+        recAgain: '🎤 Re-record Voiceover',
+        export: '⬇️ Export & Save Final Video',
+        footer: '© 2026 CutZen Studio. Client-side browser video editing tool.<br>Terms & Legal Disclaimer: Users are solely responsible for the copyright of their uploaded media and agree to comply with all applicable laws.'
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'vi' ? 'en' : 'vi';
+      const t = texts[currentLang];
+      document.getElementById('langToggle').innerText = t.btn;
+      document.getElementById('t-badge').innerText = t.badge;
+      document.getElementById('t-upload-title').innerText = t.upTitle;
+      document.getElementById('t-upload-sub').innerText = t.upSub;
+      document.getElementById('t-sec1').innerText = t.sec1;
+      document.getElementById('t-start').innerText = t.start;
+      document.getElementById('t-end').innerText = t.end;
+      document.getElementById('t-mark1').innerText = t.mark;
+      document.getElementById('t-mark2').innerText = t.mark;
+      document.getElementById('t-sec2').innerText = t.sec2;
+      document.getElementById('t-bright').innerText = t.bright;
+      document.getElementById('t-contrast').innerText = t.contrast;document.getElementById('t-saturate').innerText = t.saturate;
+      document.getElementById('t-sec3').innerText = t.sec3;
+      document.getElementById('t-vol').innerText = t.vol;
+      document.getElementById('t-pitch').innerText = t.pitch;
+      document.getElementById('voiceOverBtn').innerText = isRecordingVoice ? t.recStop : (hasVoiceOver ? t.recAgain : t.recStart);
+      document.getElementById('exportBtn').innerText = t.export;
+      document.getElementById('t-footer').innerHTML = t.footer;
+    }
+
     const videoInput = document.getElementById('videoInput');
     const video = document.getElementById('videoPreview');
     const canvas = document.getElementById('processCanvas');
@@ -129,8 +205,8 @@
 
     function parseTime(str) {
       const parts = str.split(':').map(Number);
-      if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-      if (parts.length === 2) return parts[0] * 60 + parts[1];
+      if (parts.length === 3) return parts * 3600 + parts * 60 + parts;
+      if (parts.length === 2) return parts * 60 + parts;
       return Number(str) || 0;
     }
 
@@ -140,7 +216,7 @@
     }
 
     videoInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
+      const file = e.target.files;
       if (!file) return;
       video.src = URL.createObjectURL(file);
       workspace.style.display = 'grid';
@@ -154,13 +230,14 @@
 
     function updateFilters() {
       document.getElementById('valBright').innerText = brightness.value + '%';
-      document.getElementById('valContrast').innerText = contrast.value + '%';
-      document.getElementById('valSaturate').innerText = saturate.value + '%';
-      video.style.filter = `brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%)`;document.getElementById('valVol').innerText = volume.value + '%';
+      document.getElementById('valContrast').innerText = contrast.value + '%';document.getElementById('valSaturate').innerText = saturate.value + '%';
+      video.style.filter = `brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%)`;
+
+      document.getElementById('valVol').innerText = volume.value + '%';
       if (gainNode) gainNode.gain.value = volume.value / 100;
 
       const p = parseFloat(pitch.value);
-      document.getElementById('valPitch').innerText = p === 1 ? '1.0x (Chuẩn)' : `${p}x`;
+      document.getElementById('valPitch').innerText = `${p}x`;
       video.playbackRate = p;
       video.preservesPitch = false;
     }
@@ -168,6 +245,7 @@
     [brightness, contrast, saturate, volume, pitch].forEach(el => el.addEventListener('input', updateFilters));
 
     voiceOverBtn.addEventListener('click', async () => {
+      const t = texts[currentLang];
       if (!isRecordingVoice) {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -178,23 +256,24 @@
             const blob = new Blob(voiceChunks, { type: 'audio/webm' });
             voiceAudio.src = URL.createObjectURL(blob);
             hasVoiceOver = true;
-            statusText.innerText = '✅ Đã ghi âm lồng tiếng xong! Bấm Xuất Video để lưu.';
+            statusText.innerText = currentLang === 'vi' ? '✅ Đã ghi âm lồng tiếng xong! Bấm Xuất Video để lưu.' : '✅ Voiceover saved! Click Export to save video.';
           };
           video.currentTime = parseTime(startInput.value);
           video.muted = true;
           video.play();
           mediaRecorderVoice.start();
           isRecordingVoice = true;
-          voiceOverBtn.innerText = '⏹️ Dừng ghi âm';voiceOverBtn.style.background = '#f59e0b';
+          voiceOverBtn.innerText = t.recStop;
+          voiceOverBtn.style.background = '#f59e0b';
         } catch (err) {
-          alert('Vui lòng bấm Cho phép sử dụng Micro trên trình duyệt!');
+          alert(currentLang === 'vi' ? 'Vui lòng bấm Cho phép sử dụng Micro!' : 'Please allow Microphone access!');
         }
       } else {
         mediaRecorderVoice.stop();
         video.pause();
         video.muted = false;
         isRecordingVoice = false;
-        voiceOverBtn.innerText = '🎤 Ghi âm lại lồng tiếng';
+        voiceOverBtn.innerText = t.recAgain;
         voiceOverBtn.style.background = '#e11d48';
       }
     });
@@ -219,8 +298,7 @@
     exportBtn.addEventListener('click', () => {
       const start = parseTime(startInput.value);
       const end = parseTime(endInput.value);
-      if (start >= end || end > video.duration) {
-        alert('Mốc thời gian cắt không hợp lệ, vui lòng kiểm tra lại!');
+      if (start >= end || end > video.duration) {alert(currentLang === 'vi' ? 'Mốc thời gian cắt không hợp lệ!' : 'Invalid trim timestamps!');
         return;
       }
 
@@ -251,7 +329,7 @@
         a.download = 'CutZen-Studio-Video.webm';
         a.click();
         exportBtn.disabled = false;
-        statusText.innerText = '🎉 Hoàn tất! Video đã tự động tải về máy của bạn.';
+        statusText.innerText = currentLang === 'vi' ? '🎉 Hoàn tất! Video đã tự động tải về máy.' : '🎉 Done! Video has been downloaded.';
       };
 
       video.play();
@@ -265,7 +343,8 @@
           return;
         }
         const percent = Math.min(100, Math.round(((video.currentTime - start) / (end - start)) * 100));
-        statusText.innerText = `⏳ Đang xử lý: ${percent}% (${formatTime(video.currentTime)} / ${formatTime(end)})`;ctx.filter = `brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%)`;
+        statusText.innerText = `⏳ ${percent}% (${formatTime(video.currentTime)} / ${formatTime(end)})`;
+        ctx.filter = `brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%)`;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         requestAnimationFrame(drawFrame);
       }
