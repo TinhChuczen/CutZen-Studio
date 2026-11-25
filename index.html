@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>CutZen Studio - Global Video Editor & Voiceover</title>
+  <title>CutZen Studio - Global Video Editor & Photo Maker</title>
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     body { margin: 0; background: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; padding: 15px; min-height: 100vh; top: 0 !important; }
@@ -12,11 +12,14 @@
     h1 { color: #38bdf8; margin: 0; font-size: 24px; }
     .badge { background: #10b981; color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
     
-    /* Tùy chỉnh giao diện nút dịch 100+ ngôn ngữ của Google */
     .translate-box { background: #1e293b; border: 1px solid #38bdf8; padding: 4px 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px; }
     .goog-te-gadget { font-size: 0 !important; color: transparent !important; }
     .goog-te-gadget .goog-te-combo { background: #0f172a; color: #f8fafc; border: 1px solid #475569; padding: 5px 8px; border-radius: 6px; font-size: 13px; font-weight: bold; outline: none; cursor: pointer; margin: 0 !important; }
     .goog-te-banner-frame.skiptranslate, .VIpgJd-ZVi9od-ORHb-OEVmcd { display: none !important; }
+
+    .mode-tabs { width: 100%; max-width: 1050px; display: flex; gap: 10px; margin-bottom: 15px; }
+    .tab-btn { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #38bdf8; background: #1e293b; color: #cbd5e1; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s; }
+    .tab-btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4); }
 
     .container { max-width: 1050px; width: 100%; background: #1e293b; padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     .upload-box { display: block; border: 2px dashed #38bdf8; padding: 25px; text-align: center; border-radius: 12px; cursor: pointer; margin-bottom: 20px; background: #0f172a; transition: 0.2s; }
@@ -24,18 +27,20 @@
     .workspace { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
     @media (max-width: 768px) { .workspace { grid-template-columns: 1fr; } }
     video, canvas { width: 100%; border-radius: 10px; background: #000; max-height: 440px; }
-    canvas { display: none; }
+    canvas#processCanvas { display: none; }
     .controls { background: #0f172a; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; gap: 12px; }
     .group { border-bottom: 1px solid #334155; padding-bottom: 10px; }
-    .group h3 { margin: 0 0 8px 0; font-size: 15px; color: #38bdf8; }
-    label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; color: #cbd5e1; }
+    .group h3 { margin: 0 0 8px 0; font-size: 15px; color: #38bdf8; }label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; color: #cbd5e1; }
     input[type="range"] { width: 100%; accent-color: #38bdf8; }
     .row { display: flex; gap: 8px; }
-    .row input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #1e293b; color: #fff; font-size: 14px; }.btn-quick { background: #334155; color: #38bdf8; border: 1px solid #475569; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%; margin-top: 6px; }
+    .row input, select { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #1e293b; color: #fff; font-size: 13px; }
+    .btn-quick { background: #334155; color: #38bdf8; border: 1px solid #475569; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%; margin-top: 6px; }
     button.primary { background: #0284c7; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; }
-    button.record { background: #e11d48; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; }
+    button.record { background: #e11d48; color: white; border: none; padding: 11px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; font-size: 13px; }
     button:disabled { background: #475569; cursor: not-allowed; }
-    #status { text-align: center; margin-top: 10px; color: #fbbf24; font-size: 14px; font-weight: bold; }
+    .status-text { text-align: center; margin-top: 10px; color: #fbbf24; font-size: 14px; font-weight: bold; }
+    .thumb-list { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; max-height: 110px; overflow-y: auto; }
+    .thumb-list img { width: 55px; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid #38bdf8; }
     .footer { max-width: 1050px; width: 100%; text-align: center; margin-top: 25px; font-size: 12px; color: #94a3b8; line-height: 1.6; padding-bottom: 20px; }
   </style>
 </head>
@@ -44,7 +49,7 @@
   <div class="header">
     <div class="title-group">
       <h1>🎬 CutZen Studio</h1>
-      <span class="badge">Hỗ trợ 100+ Ngôn Ngữ • Toàn Cầu</span>
+      <span class="badge">100+ Ngôn Ngữ • Toàn Cầu</span>
     </div>
     <div class="translate-box">
       <span>🌐</span>
@@ -52,10 +57,16 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="mode-tabs">
+    <button class="tab-btn active" id="tabVideo" type="button" onclick="switchMode('video')">🎬 1. Sửa Video Có Sẵn</button>
+    <button class="tab-btn" id="tabPhoto" type="button" onclick="switchMode('photo')">🖼️ 2. Ghép Ảnh Động + Nhạc</button>
+  </div>
+
+  <!-- CHẾ ĐỘ 1: SỬA VIDEO CÓ SẴN -->
+  <div class="container" id="sectionVideo">
     <label for="videoInput" class="upload-box">
       <strong style="display:block; color:#fff; font-size:15px;">📁 Bấm chọn video từ điện thoại hoặc máy tính (Hỗ trợ mọi dòng máy)</strong>
-      <p style="font-size: 12px; color: #94a3b8; margin: 5px 0 0 0;">Xử lý trực tiếp trên thiết bị • Bảo mật 100% • Không lưu trữ đám mây</p>
+      <p style="font-size: 12px; color: #94a3b8; margin: 5px 0 0 0;">Máy tính RAM mạnh hỗ trợ video dài nhiều giờ • Điện thoại nên dùng video ngắn • Bảo mật 100%</p>
       <input type="file" id="videoInput" accept="video/*,video/mp4,video/quicktime" style="display: none;">
     </label>
 
@@ -63,8 +74,7 @@
       <div>
         <video id="videoPreview" controls playsinline webkit-playsinline preload="metadata"></video>
         <canvas id="processCanvas"></canvas>
-        <div id="status"></div>
-      </div>
+        <div id="status" class="status-text"></div></div>
 
       <div class="controls">
         <div class="group">
@@ -87,7 +97,7 @@
           <h3>🎨 2. Chỉnh màu & Làm đẹp hình ảnh</h3>
           <label><span>Độ sáng:</span> <span id="valBright">100%</span></label>
           <input type="range" id="brightness" min="50" max="150" value="100">
-<label><span>Độ sắc nét (Tương phản):</span> <span id="valContrast">100%</span></label>
+          <label><span>Độ sắc nét (Tương phản):</span> <span id="valContrast">100%</span></label>
           <input type="range" id="contrast" min="50" max="150" value="100">
           <label><span>Độ tươi màu:</span> <span id="valSaturate">100%</span></label>
           <input type="range" id="saturate" min="0" max="200" value="100">
@@ -108,12 +118,104 @@
     </div>
   </div>
 
+  <!-- CHẾ ĐỘ 2: GHÉP HÌNH ẢNH ĐỘNG + NHẠC + GHI ÂM MICRO -->
+  <div class="container" id="sectionPhoto" style="display: none;">
+    <div class="workspace">
+      <div>
+        <canvas id="photoCanvas" width="1280" height="720" style="display:block;"></canvas>
+        <div id="photoStatus" class="status-text">Chọn ảnh nền ở bên phải để xem trước và tạo video</div>
+        <div class="thumb-list" id="thumbList"></div>
+      </div>
+
+      <div class="controls">
+        <div class="group">
+          <h3>🖼️ 1. Chọn ảnh, Nhạc & Lồng tiếng</h3>
+          <label for="imageFilesInput" class="btn-quick" style="text-align:center; display:block; font-weight:bold; padding:10px; background:#1e293b; color:#38bdf8; border:1px dashed #38bdf8;">➕ Chọn nhiều ảnh cảnh nền (JPG, PNG...)
+            <input type="file" id="imageFilesInput" accept="image/*" multiple style="display:none;">
+          </label>
+          <div id="imgCountText" style="font-size:12px; color:#10b981; margin-top:4px;">Chưa chọn ảnh nền</div>
+
+          <label for="musicFileInput" class="btn-quick" style="text-align:center; display:block; font-weight:bold; padding:10px; background:#1e293b; color:#38bdf8; border:1px dashed #38bdf8; margin-top:8px;">
+            🎧 Chọn tệp nhạc nền có sẵn (MP3, WAV...)
+            <input type="file" id="musicFileInput" accept="audio/*" style="display:none;">
+          </label>
+          <div id="musicNameText" style="font-size:12px; color:#10b981; margin-top:4px;">Chưa chọn nhạc nền</div>
+          <audio id="bgMusicPlayer" playsinline style="display:none;"></audio>
+
+          <button class="record" id="photoVoiceBtn" type="button" style="margin-top:8px;">🎤 Ghi âm lồng tiếng trực tiếp (Micro)</button>
+          <div id="photoVoiceStatus" style="font-size:12px; color:#fbbf24; margin-top:4px;">Chưa có bản ghi âm lồng tiếng</div>
+          <audio id="photoVoicePlayer" playsinline style="display:none;"></audio>
+        </div>
+
+        <div class="group">
+          <h3>🧍 2. Chèn ảnh nhân vật / Lớp phủ (Tùy chọn)</h3> ✨ Chọn 1 ảnh nhân vật (PNG tách nền)đè lên cảnh
+            <input type="file" id="overlayInput" accept="image/*" style="display:none;">
+          </label>
+          <div id="overlayNameText" style="font-size:12px; color:#fbbf24; margin-top:4px;">Không có ảnh nhân vật đè lên</div>
+          <div class="row" style="margin-top:6px;">
+            <div style="flex:1;">
+              <label>Vị trí nhân vật:</label>
+              <select id="overlayPos" onchange="refreshPhotoPreview()">
+                <option value="center">Ở giữa cảnh</option>
+                <option value="left">Góc bên trái</option>
+                <option value="right">Góc bên phải</option>
+              </select>
+            </div>
+            <div style="flex:1;">
+              <label><span>Cỡ ảnh:</span> <span id="valOverlayScale">50%</span></label>
+              <input type="range" id="overlayScale" min="20" max="100" value="50" oninput="document.getElementById('valOverlayScale').innerText = this.value + '%'; refreshPhotoPreview();">
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>🎨 3. Chuyển động & Làm đậm / Đổi tông màu</h3>
+          <div class="row">
+            <div style="flex:1;">
+              <label>Hiệu ứng chuyển động:</label>
+              <select id="motionEffect">
+                <option value="zoomIn">🔍 Phóng to dần (Động)</option>
+                <option value="zoomOut">🔎 Thu nhỏ dần (Động)</option>
+                <option value="none">⏸️ Đứng yên</option>
+              </select>
+            </div>
+            <div style="flex:1;">
+              <label>Chuyển tông màu ảnh:</label>
+              <select id="colorTone" onchange="refreshPhotoPreview()">
+                <option value="none">🌈 Màu gốc ban đầu</option>
+                <option value="vivid">🔥 Đậm màu & Rực rỡ</option>
+                <option value="bw">⚫ Đen trắng (Cổ điển)</option>
+                <option value="sepia">📜 Nâu vàng (Hoài niệm)</option>
+                <option value="cool">❄️ Tông lạnh (Xanh dịu)</option>
+                <option value="warm">☀️ Tông ấm (Vàng nắng)</option>
+              </select>
+            </div>
+          </div>
+          <label style="margin-top:6px;"><span>Làm đậm & Sắc nét ảnh:</span> <span id="valPhotoContrast">100%</span></label>
+          <input type="range" id="photoContrast" min="60" max="180" value="100" oninput="document.getElementById('valPhotoContrast').innerText = this.value + '%'; refreshPhotoPreview();">
+        </div>
+
+        <div class="group" style="border:none;">
+          <h3>⏱️ 4. Thời gian & Khung hình xuất</h3>
+          <label><span>Thời gian mỗi ảnh:</span> <span id="valSecPerImg">4 giây</span></label>
+          <input type="range" id="secPerImg" min="1" max="15" value="4" oninput="document.getElementById('valSecPerImg').innerText = this.value + ' giây'"><label style="margin-top:6px;">Tỷ lệ khung hình video:</label>
+          <select id="aspectRatio" onchange="updatePhotoCanvasSize()">
+            <option value="1280x720">16:9 Ngang (YouTube / TV)</option>
+            <option value="720x1280">9:16 Dọc (TikTok / YouTube Shorts)</option>
+            <option value="1080x1080">1:1 Vuông (Facebook / Instagram)</option>
+          </select>
+        </div>
+
+        <button class="primary" id="exportPhotoBtn" type="button">🎬 Tạo & Xuất Video Hoàn Chỉnh</button>
+      </div>
+    </div>
+  </div>
+
   <div class="footer">
     © 2026 CutZen Studio. Công cụ xử lý video trực tiếp trên thiết bị người dùng.<br>
     Điều khoản & Pháp lý: Người dùng tự chịu trách nhiệm về bản quyền nội dung, hình ảnh, âm thanh sử dụng và cam kết tuân thủ quy định pháp luật hiện hành.
   </div>
 
-  <!-- Bộ công cụ dịch tự động 100+ ngôn ngữ của Google -->
   <script type="text/javascript">
     function googleTranslateElementInit() {
       new google.translate.TranslateElement({
@@ -122,10 +224,33 @@
         autoDisplay: false
       }, 'google_translate_element');
     }
-<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-  <!-- Bộ xử lý Video tương thích mọi dòng máy -->
+  </script>
+  <script type="text/javascript" src="https:translate//google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
   <script>
+    function switchMode(mode) {
+      document.getElementById('sectionVideo').style.display = mode === 'video' ? 'block' : 'none';
+      document.getElementById('sectionPhoto').style.display = mode === 'photo' ? 'block' : 'none';
+      document.getElementById('tabVideo').classList.toggle('active', mode === 'video');
+      document.getElementById('tabPhoto').classList.toggle('active', mode === 'photo');
+    }
+
+    function getSupportedVideoType() {
+      const types = ['video/mp4', 'video/webm;codecs=vp8,opus', 'video/webm', ''];
+      for (let t of types) {
+        if (!t || (window.MediaRecorder && MediaRecorder.isTypeSupported(t))) return t;
+      }
+      return '';
+    }
+
+    function getSupportedAudioType() {
+      const types = ['audio/mp4', 'audio/webm', 'audio/ogg', ''];
+      for (let t of types) {
+        if (!t || (window.MediaRecorder && MediaRecorder.isTypeSupported(t))) return t;
+      }
+      return '';
+    }
+
+    // ================= PHẦN 1: SỬA VIDEO CÓ SẴN =================
     const videoInput = document.getElementById('videoInput');
     const video = document.getElementById('videoPreview');
     const canvas = document.getElementById('processCanvas');
@@ -142,7 +267,9 @@
     const contrast = document.getElementById('contrast');
     const saturate = document.getElementById('saturate');
     const volume = document.getElementById('volume');
-    const pitch = document.getElementById('pitch');let audioCtx, gainNode, sourceNode, destNode, voiceSourceNode;
+    const pitch = document.getElementById('pitch');
+
+    let audioCtx, gainNode, sourceNode, destNode, voiceSourceNode;
     let mediaRecorderVoice, voiceChunks = [], isRecordingVoice = false, hasVoiceOver = false;
     let currentVideoUrl = null;
 
@@ -156,164 +283,628 @@
 
     function parseTime(str) {
       const parts = str.split(':').map(Number);
-      if (parts.length === 3) return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
-      if (parts.length === 2) return (parts[0] || 0) * 60 + (parts[1] || 0);
+      if (parts.length === 3) return (parts.at(0) || 0) * 3600 + (parts.at(1) || 0) * 60 + (parts.at(2) || 0);
+      if (parts.length === 2) return (parts.at(0) || 0) * 60 + (parts.at(1) || 0);
       return Number(str) || 0;
     }
 
     function setMarker(type) {
       if (type === 'start') startInput.value = formatTime(video.currentTime);
       if (type === 'end') endInput.value = formatTime(video.currentTime);
-    }
-
-    videoInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
+    }videoInput.addEventListener('change', (e) => {
+      const file = e.target.files.item(0);
       if (!file) return;
       if (currentVideoUrl) URL.revokeObjectURL(currentVideoUrl);
       currentVideoUrl = URL.createObjectURL(file);
-      
-      workspace.style.display = 'grid';statusText.innerText = '⏳ Đang tải video lên khung hình...';
-video.src = currentVideoUrl;
-video.load();
-video.onloadedmetadata = () => {
-startInput.value = '00:00:00';
-endInput.value = formatTime(video.duration);
-canvas.width = video.videoWidth || 1280;
-canvas.height = video.videoHeight || 720;
-statusText.innerText = '✅ Đã tải video sẵn sàng!';
-};
-});
-function updateFilters() {
-document.getElementById('valBright').innerText = brightness.value + '%';
-document.getElementById('valContrast').innerText = contrast.value + '%';
-document.getElementById('valSaturate').innerText = saturate.value + '%';
-video.style.filter = brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%);
-document.getElementById('valVol').innerText = volume.value + '%';
-if (gainNode) gainNode.gain.value = volume.value / 100;
-const p = parseFloat(pitch.value);
-document.getElementById('valPitch').innerText = ${p}x;
-video.playbackRate = p;
-if ('preservesPitch' in video) video.preservesPitch = false;
-}
-[brightness, contrast, saturate, volume, pitch].forEach(el => el.addEventListener('input', updateFilters));
-function getSupportedAudioType() {
-const types = ['audio/mp4', 'audio/webm', 'audio/ogg', ''];
-for (let t of types) {
-if (!t || (window.MediaRecorder && MediaRecorder.isTypeSupported(t))) return t;
-}
-return '';
-}
-function getSupportedVideoType() {
-const types = ['video/mp4', 'video/webm;codecs=vp8,opus', 'video/webm', ''];
-for (let t of types) {
-if (!t || (window.MediaRecorder && MediaRecorder.isTypeSupported(t))) return t;
-}
-return '';
-}
-voiceOverBtn.addEventListener('click', async () => {
-if (!isRecordingVoice) {
-try {
-const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-const mime = getSupportedAudioType();
-mediaRecorderVoice = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
-voiceChunks = [];
-mediaRecorderVoice.ondataavailable = e => { if (e.data && e.data.size > 0) voiceChunks.push(e.data); };
-mediaRecorderVoice.onstop = () => {
-const blob = new Blob(voiceChunks, { type: mime || 'audio/mp4' });
-voiceAudio.src = URL.createObjectURL(blob);
-hasVoiceOver = true;
-stream.getTracks().forEach(track => track.stop());
-statusText.innerText = '✅ Đã ghi âm lồng tiếng xong! Bấm Xuất Video để lưu.';
-};
-video.currentTime = parseTime(startInput.value);
-video.muted = true;
-await video.play();
-mediaRecorderVoice.start();
-isRecordingVoice = true;
-voiceOverBtn.innerText = '⏹️ Dừng ghi âm';
-voiceOverBtn.style.background = '#f59e0b';
-} catch (err) {
-alert('Thiết bị chưa cấp quyền Micro hoặc trình duyệt không hỗ trợ ghi âm!');
-}
-} else {
-mediaRecorderVoice.stop();
-video.pause();
-video.muted = false;
-isRecordingVoice = false;
-voiceOverBtn.innerText = '🎤 Ghi âm lại lồng tiếng';
-voiceOverBtn.style.background = '#e11d48';
-}
-});
-function initAudio() {
-if (!audioCtx) {
-const AudioContextClass = window.AudioContext || window.webkitAudioContext;audioCtx = new AudioContextClass();
-sourceNode = audioCtx.createMediaElementSource(video);
-gainNode = audioCtx.createGain();
-destNode = audioCtx.createMediaStreamDestination();
-sourceNode.connect(gainNode);
-gainNode.connect(audioCtx.destination);
-gainNode.connect(destNode);
-voiceSourceNode = audioCtx.createMediaElementSource(voiceAudio);
-voiceSourceNode.connect(audioCtx.destination);
-voiceSourceNode.connect(destNode);
-}
-gainNode.gain.value = volume.value / 100;
-}
-exportBtn.addEventListener('click', async () => {
-const start = parseTime(startInput.value);
-const end = parseTime(endInput.value);
-if (start >= end || end > video.duration + 0.5) {
-alert('Mốc thời gian cắt không hợp lệ!');
-return;
-}
-if (!window.MediaRecorder || !canvas.captureStream) {
-alert('Trình duyệt trên máy quá cũ chưa hỗ trợ xuất video trực tiếp. Vui lòng cập nhật Chrome hoặc Safari mới nhất!');
-return;
-}
-initAudio();
-if (audioCtx.state === 'suspended') await audioCtx.resume();
-exportBtn.disabled = true;
-video.currentTime = start;
-if (hasVoiceOver) {
-voiceAudio.currentTime = 0;
-voiceAudio.play();
-}
-const canvasStream = canvas.captureStream(30);
-const combinedStream = new MediaStream([
-...canvasStream.getVideoTracks(),
-...destNode.stream.getAudioTracks()
-]);
-const videoMime = getSupportedVideoType();
-const fileExt = videoMime.includes('mp4') ? 'mp4' : 'webm';
-const recorder = videoMime ? new MediaRecorder(combinedStream, { mimeType: videoMime }) : new MediaRecorder(combinedStream);
-const chunks = [];
-recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
-recorder.onstop = () => {
-const blob = new Blob(chunks, { type: videoMime || 'video/mp4' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = CutZen-Studio-Video.${fileExt};
-document.body.appendChild(a);
+      workspace.style.display = 'grid';
+      statusText.innerText = '⏳ Đang tải video lên khung hình...';
+      video.src = currentVideoUrl;
+      video.load();
+      video.onloadedmetadata = () => {
+        startInput.value = '00:00:00';
+        endInput.value = formatTime(video.duration);
+        canvas.width = video.videoWidth || 1280;
+        canvas.height = video.videoHeight || 720;
+        statusText.innerText = '✅ Đã tải video sẵn sàng!';
+      };
+    });
+
+    function updateFilters() {
+      document.getElementById('valBright').innerText = brightness.value + '%';
+      document.getElementById('valContrast').innerText = contrast.value + '%';
+      document.getElementById('valSaturate').innerText = saturate.value + '%';
+      video.style.filter = `brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%)`;
+      document.getElementById('valVol').innerText = volume.value + '%';
+      if (gainNode) gainNode.gain.value = volume.value / 100;
+      const p = parseFloat(pitch.value);
+      document.getElementById('valPitch').innerText = `${p}x`;
+      video.playbackRate = p;
+      if ('preservesPitch' in video) video.preservesPitch = false;
+    }
+
+    [brightness, contrast, saturate, volume, pitch].forEach(el => el.addEventListener('input', updateFilters));
+
+    voiceOverBtn.addEventListener('click', async () => {
+      if (!isRecordingVoice) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const mime = getSupportedAudioType();
+          mediaRecorderVoice = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+          voiceChunks = [];
+          mediaRecorderVoice.ondataavailable = e => { if (e.data && e.data.size > 0) voiceChunks.push(e.data); };
+          mediaRecorderVoice.onstop = () => {
+            const blob = new Blob(voiceChunks, { type: mime || 'audio/mp4' });
+            voiceAudio.src = URL.createObjectURL(blob);
+            hasVoiceOver = true;
+            stream.getTracks().forEach(track => track.stop());
+            statusText.innerText = '✅ Đã ghi âm lồng tiếng xong! Bấm Xuất Video để lưu.';
+          };
+          video.currentTime = parseTime(startInput.value);
+          video.muted = true;
+          await video.play();
+          mediaRecorderVoice.start();
+          isRecordingVoice = true;
+          voiceOverBtn.innerText = '⏹️ Dừng ghi âm';
+          voiceOverBtn.style.background = '#f59e0b';
+        } catch (err) {
+          alert('Thiết bị chưa cấp quyền Micro hoặc trình duyệt không hỗ trợ ghi âm!');
+        }
+      } else {
+        mediaRecorderVoice.stop();
+        video.pause();
+        video.muted = false;isRecordingVoice = false;
+        voiceOverBtn.innerText = '🎤 Ghi âm lại lồng tiếng';
+        voiceOverBtn.style.background = '#e11d48';
+      }
+    });
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+        sourceNode = audioCtx.createMediaElementSource(video);
+        gainNode = audioCtx.createGain();
+        destNode = audioCtx.createMediaStreamDestination();
+        sourceNode.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        gainNode.connect(destNode);
+        voiceSourceNode = audioCtx.createMediaElementSource(voiceAudio);
+        voiceSourceNode.connect(audioCtx.destination);
+        voiceSourceNode.connect(destNode);
+      }
+      gainNode.gain.value = volume.value / 100;
+    }
+
+    exportBtn.addEventListener('click', async () => {
+      const start = parseTime(startInput.value);
+      const end = parseTime(endInput.value);
+      if (start >= end || end > video.duration + 0.5) {
+        alert('Mốc thời gian cắt không hợp lệ!');
+        return;
+      }
+      if (!window.MediaRecorder || !canvas.captureStream) {
+        alert('Trình duyệt trên máy quá cũ chưa hỗ trợ xuất video trực tiếp.');
+        return;
+      }
+      initAudio();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+      exportBtn.disabled = true;
+      video.currentTime = start;
+      if (hasVoiceOver) { voiceAudio.currentTime = 0; voiceAudio.play(); }
+      const canvasStream = canvas.captureStream(30);
+      const combinedStream = new MediaStream([...canvasStream.getVideoTracks(), ...destNode.stream.getAudioTracks()]);
+      const videoMime = getSupportedVideoType();
+      const fileExt = videoMime.includes('mp4') ? 'mp4' : 'webm';
+      const recorder = videoMime ? new MediaRecorder(combinedStream, { mimeType: videoMime }) : new MediaRecorder(combinedStream);
+      const chunks = [];
+      recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: videoMime || 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `CutZen-Studio-Video.${fileExt}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        exportBtn.disabled = false;
+        statusText.innerText = '🎉 Hoàn tất! Video đã tự động lưu về máy.';
+      };
+      await video.play();
+      recorder.start(1000);
+      function drawFrame() {
+        if (video.currentTime >= end || video.paused || video.ended) {
+          video.pause();
+          voiceAudio.pause();
+          if (recorder.state === 'recording') recorder.stop();
+          return;
+        }const percent = Math.min(100, Math.round(((video.currentTime - start) / (end - start)) * 100));
+        statusText.innerText = `⏳ ${percent}% (${formatTime(video.currentTime)} / ${formatTime(end)})`;
+        ctx.filter = `brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%)`;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        requestAnimationFrame(drawFrame);
+      }
+      drawFrame();
+    });
+//PHẦN 2: GHÉP HÌNH ẢNH ĐỘNG + NHẠC + GHI ÂM MICRO =================
+    const imageFilesInput = document.getElementById('imageFilesInput');
+    const musicFileInput = document.getElementById('musicFileInput');
+    const overlayInput = document.getElementById('overlayInput');
+    const bgMusicPlayer = document.getElementById('bgMusicPlayer');
+    const photoVoiceBtn = document.getElementById('photoVoiceBtn');
+    const photoVoicePlayer = document.getElementById('photoVoicePlayer');
+    const photoCanvas = document.getElementById('photoCanvas');
+    const pCtx = photoCanvas.getContext('2d');
+    const photoStatus = document.getElementById('photoStatus');
+    const thumbList = document.getElementById('thumbList');
+    const exportPhotoBtn = document.getElementById('exportPhotoBtn');
+
+    let loadedImages = [];
+    let overlayImage = null;
+    let hasMusic = false;
+    let hasPhotoVoice = false;
+    let isRecordingPhotoVoice = false;
+    let photoVoiceRecorder, photoVoiceChunks = [], photoPreviewTimer = null;
+    let photoAudioCtx, photoMusicSource, photoVoiceSource, photoAudioDest;
+
+    function getPhotoFilterString() {
+      const c = document.getElementById('photoContrast').value;
+      const tone = document.getElementById('colorTone').value;
+      let toneFilter = '';
+      if (tone === 'vivid') toneFilter = 'saturate(155%) brightness(105%)';
+      else if (tone === 'bw') toneFilter = 'grayscale(100%)';
+      else if (tone === 'sepia') toneFilter = 'sepia(85%)';
+      else if (tone === 'cool') toneFilter = 'hue-rotate(180deg) saturate(115%)';
+      else if (tone === 'warm') toneFilter = 'sepia(35%) saturate(135%)';
+      return `contrast(${c}%) ${toneFilter}`.trim();
+    }
+
+    function drawPhotoScene(img, zoomFactor = 1.0) {
+      if (!img) return;
+      pCtx.save();
+      pCtx.fillStyle = '#000';
+      pCtx.fillRect(0, 0, photoCanvas.width, photoCanvas.height);
+      pCtx.filter = getPhotoFilterString();
+
+      const baseScale = Math.min(photoCanvas.width / img.width, photoCanvas.height / img.height);
+      const scale = baseScale * zoomFactor;
+      const drawW = img.width * scale;
+      const drawH = img.height * scale;
+      const x = (photoCanvas.width - drawW) / 2;
+      const y = (photoCanvas.height - drawH) / 2;
+      pCtx.drawImage(img, x, y, drawW, drawH);
+
+      if (overlayImage && overlayImage.width > 0) {
+        const scalePct = Number(document.getElementById('overlayScale').value) / 100;
+        const pos = document.getElementById('overlayPos').value;
+        const ovH = photoCanvas.height * scalePct;
+        const ovW = overlayImage.width * (ovH / overlayImage.height);
+        let ovX = (photoCanvas.width - ovW) / 2;
+        if (pos === 'left') ovX = photoCanvas.width * 0.05;
+        else if (pos === 'right') ovX = photoCanvas.width - ovW - (photoCanvas.width * 0.05);
+        const ovY = photoCanvas.height - ovH;
+        pCtx.drawImage(overlayImage, ovX, ovY, ovW, ovH);
+      }pCtx.restore();
+    }
+
+    function refreshPhotoPreview() {
+      if (loadedImages.length > 0) drawPhotoScene(loadedImages.at(0), 1.0);
+    }
+
+    function updatePhotoCanvasSize() {
+      const [w, h] = document.getElementById('aspectRatio').value.split('x').map(Number);
+      photoCanvas.width = w;
+      photoCanvas.height = h;
+      refreshPhotoPreview();
+    }
+
+    imageFilesInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+      loadedImages = [];
+      thumbList.innerHTML = '';
+      photoStatus.innerText = '⏳ Đang tải hình ảnh...';
+
+      for (const file of files) {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.src = url;
+        await new Promise(res => { img.onload = res; img.onerror = res; });
+        if (img.width > 0) {
+          loadedImages.push(img);
+          const thumb = document.createElement('img');
+          thumb.src = url;
+          thumbList.appendChild(thumb);
+        }
+      }
+
+      document.getElementById('imgCountText').innerText = `✅ Đã chọn ${loadedImages.length} ảnh nền`;
+      if (loadedImages.length > 0) {
+        refreshPhotoPreview();
+        photoStatus.innerText = '✅ Ảnh đã sẵn sàng! Có thể ghi âm lồng tiếng hoặc bấm Tạo Video.';
+      }
+    });
+
+    overlayInput.addEventListener('change', async (e) => {
+      const file = e.target.files.item(0);
+      if (!file) return;
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise(res => { img.onload = res; img.onerror = res; });
+      if (img.width > 0) {
+        overlayImage = img;
+        document.getElementById('overlayNameText').innerText = `✅ Nhân vật: ${file.name}`;
+        refreshPhotoPreview();
+      }
+    });
+
+    musicFileInput.addEventListener('change', (e) => {
+      const file = e.target.files.item(0);
+      if (!file) return;
+      bgMusicPlayer.src = URL.createObjectURL(file);
+      hasMusic = true;
+      document.getElementById('musicNameText').innerText = `✅ Nhạc nền: ${file.name}`;
+    });
+
+    photoVoiceBtn.addEventListener('click', async () => {
+      if (!isRecordingPhotoVoice) {
+        if (loadedImages.length === 0) {
+          alert('Vui lòng chọn ít nhất 1 ảnh nền trước để nhìn ảnh khi ghi âm lồng tiếng!');
+          return;
+        }
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const mime = getSupportedAudioType();
+          photoVoiceRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+          photoVoiceChunks = [];
+          photoVoiceRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) photoVoiceChunks.push(e.data); };
+          photoVoiceRecorder.onstop = () => {
+            const blob = new Blob(photoVoiceChunks, { type: mime || 'audio/mp4' });photoVoicePlayer.src = URL.createObjectURL(blob);
+            hasPhotoVoice = true;
+            stream.getTracks().forEach(track => track.stop());
+            clearInterval(photoPreviewTimer);
+            refreshPhotoPreview();
+            document.getElementById('photoVoiceStatus').innerText = '✅ Đã lưu bản ghi âm lồng tiếng!';
+            photoStatus.innerText = '✅ Ghi âm xong! Bấm Tạo & Xuất Video để ghép hoàn chỉnh.';
+          };
+
+          photoVoiceRecorder.start();
+          isRecordingPhotoVoice = true;
+          photoVoiceBtn.innerText = '⏹️ Dừng ghi âm lồng tiếng';
+          photoVoiceBtn.style.background = '#f59e0b';
+          photoStatus.innerText = '🎙️ Đang thu âm qua Micro... Hãy nói lời thuyết minh!';
+
+          const secPerImg = Number(document.getElementById('secPerImg').value) || 4;
+          let previewIdx = 0;
+          drawPhotoScene(loadedImages.at(0), 1.0);
+          photoPreviewTimer = setInterval(() => {
+            previewIdx = (previewIdx + 1) % loadedImages.length;
+            drawPhotoScene(loadedImages.at(previewIdx), 1.0);
+          }, secPerImg * 1000);
+
+        } catch (err) {
+          alert('Thiết bị chưa cấp quyền Micro hoặc trình duyệt không hỗ trợ ghi âm!');
+        }
+      } else {
+        photoVoiceRecorder.stop();
+        isRecordingPhotoVoice = false;
+        photoVoiceBtn.innerText = '🎤 Ghi âm lại lồng tiếng (Micro)';
+        photoVoiceBtn.style.background = '#e11d48';
+      }
+    });
+
+    exportPhotoBtn.addEventListener('click', async () => {
+      if (loadedImages.length === 0) {
+        alert('Vui lòng chọn ít nhất 1 ảnh nền trước khi tạo video!');
+        return;
+      }
+      if (!window.MediaRecorder || !photoCanvas.captureStream) {
+        alert('Trình duyệt trên máy quá cũ chưa hỗ trợ xuất video trực tiếp.');
+        return;
+      }
+
+      const secPerImg = Number(document.getElementById('secPerImg').value) || 4;
+      const motion = document.getElementById('motionEffect').value;
+      const totalDurationMs = loadedImages.length * secPerImg * 1000;
+
+      exportPhotoBtn.disabled = true;
+      const tracks = [...photoCanvas.captureStream(30).getVideoTracks()];
+
+      if (hasMusic || hasPhotoVoice) {
+        if (!photoAudioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          photoAudioCtx = new AudioContextClass();
+          photoAudioDest = photoAudioCtx.createMediaStreamDestination();
+
+          photoMusicSource = photoAudioCtx.createMediaElementSource(bgMusicPlayer);
+          photoMusicSource.connect(photoAudioCtx.destination);
+          photoMusicSource.connect(photoAudioDest);
+
+          photoVoiceSource = photoAudioCtx.createMediaElementSource(photoVoicePlayer);
+          photoVoiceSource.connect(photoAudioCtx.destination);
+          photoVoiceSource.connect(photoAudioDest);
+        }if (photoAudioCtx.state === 'suspended') await photoAudioCtx.resume();
+
+        if (hasMusic) {
+          bgMusicPlayer.currentTime = 0;
+          bgMusicPlayer.loop = true;
+          bgMusicPlayer.volume = hasPhotoVoice ? 0.35 : 1.0;
+          await bgMusicPlayer.play();
+        }
+        if (hasPhotoVoice) {
+          photoVoicePlayer.currentTime = 0;
+          await photoVoicePlayer.play();
+        }
+        tracks.push(...photoAudioDest.stream.getAudioTracks());
+      }
+
+      const combinedStream = new MediaStream(tracks);
+      const videoMime = getSupportedVideoType();
+      const fileExt = videoMime.includes('mp4') ? 'mp4' : 'webm';
+      const recorder = videoMime ? new MediaRecorder(combinedStream, { mimeType: videoMime }) : new MediaRecorder(combinedStream);
+      const chunks = [];
+
+      recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = () => {
+        if (hasMusic) bgMusicPlayer.pause();
+        if (hasPhotoVoice) photoVoicePlayer.pause();
+        const blob = new Blob(chunks, { type: videoMime || 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+
+'a.download = 'CutZen-Animated-Video.${fileExt};// ================= PHẦN 2: GHÉP HÌNH ẢNH ĐỘNG + NHẠC + GHI ÂM MICRO =================
+    const imageFilesInput = document.getElementById('imageFilesInput');
+    const musicFileInput = document.getElementById('musicFileInput');
+    const overlayInput = document.getElementById('overlayInput');
+    const bgMusicPlayer = document.getElementById('bgMusicPlayer');
+    const photoVoiceBtn = document.getElementById('photoVoiceBtn');
+    const photoVoicePlayer = document.getElementById('photoVoicePlayer');
+    const photoCanvas = document.getElementById('photoCanvas');
+    const pCtx = photoCanvas.getContext('2d');
+    const photoStatus = document.getElementById('photoStatus');
+    const thumbList = document.getElementById('thumbList');
+    const exportPhotoBtn = document.getElementById('exportPhotoBtn');
+
+    let loadedImages = [];
+    let overlayImage = null;
+    let hasMusic = false;
+    let hasPhotoVoice = false;
+    let isRecordingPhotoVoice = false;
+    let photoVoiceRecorder, photoVoiceChunks = [], photoPreviewTimer = null;
+    let photoAudioCtx, photoMusicSource, photoVoiceSource, photoAudioDest;
+
+    function getPhotoFilterString() {
+      const c = document.getElementById('photoContrast').value;
+      const tone = document.getElementById('colorTone').value;
+      let toneFilter = '';
+      if (tone === 'vivid') toneFilter = 'saturate(155%) brightness(105%)';
+      else if (tone === 'bw') toneFilter = 'grayscale(100%)';
+      else if (tone === 'sepia') toneFilter = 'sepia(85%)';
+      else if (tone === 'cool') toneFilter = 'hue-rotate(180deg) saturate(115%)';
+      else if (tone === 'warm') toneFilter = 'sepia(35%) saturate(135%)';
+      return `contrast(${c}%) ${toneFilter}`.trim();
+    }
+
+    function drawPhotoScene(img, zoomFactor = 1.0) {
+      if (!img) return;
+      pCtx.save();
+      pCtx.fillStyle = '#000';
+      pCtx.fillRect(0, 0, photoCanvas.width, photoCanvas.height);
+      pCtx.filter = getPhotoFilterString();
+
+      const baseScale = Math.min(photoCanvas.width / img.width, photoCanvas.height / img.height);
+      const scale = baseScale * zoomFactor;
+      const drawW = img.width * scale;
+      const drawH = img.height * scale;
+      const x = (photoCanvas.width - drawW) / 2;
+      const y = (photoCanvas.height - drawH) / 2;
+      pCtx.drawImage(img, x, y, drawW, drawH);
+
+      if (overlayImage && overlayImage.width > 0) {
+        const scalePct = Number(document.getElementById('overlayScale').value) / 100;
+        const pos = document.getElementById('overlayPos').value;
+        const ovH = photoCanvas.height * scalePct;
+        const ovW = overlayImage.width * (ovH / overlayImage.height);
+        let ovX = (photoCanvas.width - ovW) / 2;
+        if (pos === 'left') ovX = photoCanvas.width * 0.05;
+        else if (pos === 'right') ovX = photoCanvas.width - ovW - (photoCanvas.width * 0.05);
+        const ovY = photoCanvas.height - ovH;
+        pCtx.drawImage(overlayImage, ovX, ovY, ovW, ovH);
+      }pCtx.restore();
+    }
+
+    function refreshPhotoPreview() {
+      if (loadedImages.length > 0) drawPhotoScene(loadedImages.at(0), 1.0);
+    }
+
+    function updatePhotoCanvasSize() {
+      const [w, h] = document.getElementById('aspectRatio').value.split('x').map(Number);
+      photoCanvas.width = w;
+      photoCanvas.height = h;
+      refreshPhotoPreview();
+    }
+
+    imageFilesInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+      loadedImages = [];
+      thumbList.innerHTML = '';
+      photoStatus.innerText = '⏳ Đang tải hình ảnh...';
+
+      for (const file of files) {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.src = url;
+        await new Promise(res => { img.onload = res; img.onerror = res; });
+        if (img.width > 0) {
+          loadedImages.push(img);
+          const thumb = document.createElement('img');
+          thumb.src = url;
+          thumbList.appendChild(thumb);
+        }
+      }
+
+      document.getElementById('imgCountText').innerText = `✅ Đã chọn ${loadedImages.length} ảnh nền`;
+      if (loadedImages.length > 0) {
+        refreshPhotoPreview();
+        photoStatus.innerText = '✅ Ảnh đã sẵn sàng! Có thể ghi âm lồng tiếng hoặc bấm Tạo Video.';
+      }
+    });
+
+    overlayInput.addEventListener('change', async (e) => {
+      const file = e.target.files.item(0);
+      if (!file) return;
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise(res => { img.onload = res; img.onerror = res; });
+      if (img.width > 0) {
+        overlayImage = img;
+        document.getElementById('overlayNameText').innerText = `✅ Nhân vật: ${file.name}`;
+        refreshPhotoPreview();
+      }
+    });
+
+    musicFileInput.addEventListener('change', (e) => {
+      const file = e.target.files.item(0);
+      if (!file) return;
+      bgMusicPlayer.src = URL.createObjectURL(file);
+      hasMusic = true;
+      document.getElementById('musicNameText').innerText = `✅ Nhạc nền: ${file.name}`;
+    });
+
+    photoVoiceBtn.addEventListener('click', async () => {
+      if (!isRecordingPhotoVoice) {
+        if (loadedImages.length === 0) {
+          alert('Vui lòng chọn ít nhất 1 ảnh nền trước để nhìn ảnh khi ghi âm lồng tiếng!');
+          return;
+        }
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const mime = getSupportedAudioType();
+          photoVoiceRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+          photoVoiceChunks = [];
+          photoVoiceRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) photoVoiceChunks.push(e.data); };
+          photoVoiceRecorder.onstop = () => {
+            const blob = new Blob(photoVoiceChunks, { type: mime || 'audio/mp4' });photoVoicePlayer.src = URL.createObjectURL(blob);
+            hasPhotoVoice = true;
+            stream.getTracks().forEach(track => track.stop());
+            clearInterval(photoPreviewTimer);
+            refreshPhotoPreview();
+            document.getElementById('photoVoiceStatus').innerText = '✅ Đã lưu bản ghi âm lồng tiếng!';
+            photoStatus.innerText = '✅ Ghi âm xong! Bấm Tạo & Xuất Video để ghép hoàn chỉnh.';
+          };
+
+          photoVoiceRecorder.start();
+          isRecordingPhotoVoice = true;
+          photoVoiceBtn.innerText = '⏹️ Dừng ghi âm lồng tiếng';
+          photoVoiceBtn.style.background = '#f59e0b';
+          photoStatus.innerText = '🎙️ Đang thu âm qua Micro... Hãy nói lời thuyết minh!';
+
+          const secPerImg = Number(document.getElementById('secPerImg').value) || 4;
+          let previewIdx = 0;
+          drawPhotoScene(loadedImages.at(0), 1.0);
+          photoPreviewTimer = setInterval(() => {
+            previewIdx = (previewIdx + 1) % loadedImages.length;
+            drawPhotoScene(loadedImages.at(previewIdx), 1.0);
+          }, secPerImg * 1000);
+
+        } catch (err) {
+          alert('Thiết bị chưa cấp quyền Micro hoặc trình duyệt không hỗ trợ ghi âm!');
+        }
+      } else {
+        photoVoiceRecorder.stop();
+        isRecordingPhotoVoice = false;
+        photoVoiceBtn.innerText = '🎤 Ghi âm lại lồng tiếng (Micro)';
+        photoVoiceBtn.style.background = '#e11d48';
+      }
+    });
+
+    exportPhotoBtn.addEventListener('click', async () => {
+      if (loadedImages.length === 0) {
+        alert('Vui lòng chọn ít nhất 1 ảnh nền trước khi tạo video!');
+        return;
+      }
+      if (!window.MediaRecorder || !photoCanvas.captureStream) {
+        alert('Trình duyệt trên máy quá cũ chưa hỗ trợ xuất video trực tiếp.');
+        return;
+      }
+
+      const secPerImg = Number(document.getElementById('secPerImg').value) || 4;
+      const motion = document.getElementById('motionEffect').value;
+      const totalDurationMs = loadedImages.length * secPerImg * 1000;
+
+      exportPhotoBtn.disabled = true;
+      const tracks = [...photoCanvas.captureStream(30).getVideoTracks()];
+
+      if (hasMusic || hasPhotoVoice) {
+        if (!photoAudioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          photoAudioCtx = new AudioContextClass();
+          photoAudioDest = photoAudioCtx.createMediaStreamDestination();
+
+          photoMusicSource = photoAudioCtx.createMediaElementSource(bgMusicPlayer);
+          photoMusicSource.connect(photoAudioCtx.destination);
+          photoMusicSource.connect(photoAudioDest);
+
+          photoVoiceSource = photoAudioCtx.createMediaElementSource(photoVoicePlayer);
+          photoVoiceSource.connect(photoAudioCtx.destination);
+          photoVoiceSource.connect(photoAudioDest);
+        }if (photoAudioCtx.state === 'suspended') await photoAudioCtx.resume();
+
+        if (hasMusic) {
+          bgMusicPlayer.currentTime = 0;
+          bgMusicPlayer.loop = true;
+          bgMusicPlayer.volume = hasPhotoVoice ? 0.35 : 1.0;
+          await bgMusicPlayer.play();
+        }
+        if (hasPhotoVoice) {
+          photoVoicePlayer.currentTime = 0;
+          await photoVoicePlayer.play();
+        }
+        tracks.push(...photoAudioDest.stream.getAudioTracks());
+      }
+
+      const combinedStream = new MediaStream(tracks);
+      const videoMime = getSupportedVideoType();
+      const fileExt = videoMime.includes('mp4') ? 'mp4' : 'webm';
+      const recorder = videoMime ? new MediaRecorder(combinedStream, { mimeType: videoMime }) : new MediaRecorder(combinedStream);
+      const chunks = [];
+
+      recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = () => {
+        if (hasMusic) bgMusicPlayer.pause();
+        if (hasPhotoVoice) photoVoicePlayer.pause();
+        const blob = new Blob(chunks, { type: videoMime || 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+
+a.download = CutZen-Animated-Video.${fileExt};document.body.appendChild(a);
 a.click();
 document.body.removeChild(a);
-exportBtn.disabled = false;
-statusText.innerText = '🎉 Hoàn tất! Video đã tự động lưu về máy.';
+exportPhotoBtn.disabled = false;
+photoStatus.innerText = '🎉 Hoàn tất! Video hiệu ứng động đã tự động lưu về máy.';
 };
-await video.play();
 recorder.start(1000);
-function drawFrame() {
-if (video.currentTime >= end || video.paused || video.ended) {
-video.pause();
-voiceAudio.pause();
+const startTime = performance.now();
+function renderSlideshow(now) {
+const elapsed = now - startTime;
+if (elapsed >= totalDurationMs) {
 if (recorder.state === 'recording') recorder.stop();
 return;
 }
-const percent = Math.min(100, Math.round(((video.currentTime - start) / (end - start)) * 100));
-statusText.innerText = ⏳ ${percent}% (${formatTime(video.currentTime)} / ${formatTime(end)});
-ctx.filter = brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%);
-ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-requestAnimationFrame(drawFrame);
+const imgDurationMs = secPerImg * 1000;
+const imgIndex = Math.min(loadedImages.length - 1, Math.floor(elapsed / imgDurationMs));
+const progressInImg = (elapsed % imgDurationMs) / imgDurationMs;
+let zoom = 1.0;
+if (motion === 'zoomIn') zoom = 1.0 + (0.18 * progressInImg);
+else if (motion === 'zoomOut') zoom = 1.18 - (0.18 * progressInImg);
+drawPhotoScene(loadedImages.at(imgIndex), zoom);
+const percent = Math.min(100, Math.round((elapsed / totalDurationMs) * 100));
+photoStatus.innerText = ⏳ Đang tạo cảnh ${imgIndex + 1}/${loadedImages.length} (${percent}%)...;
+requestAnimationFrame(renderSlideshow);
 }
-drawFrame();
+requestAnimationFrame(renderSlideshow);
 });
+  
