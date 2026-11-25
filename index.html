@@ -2,19 +2,24 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>CutZen Studio - Global Video Editor & Voiceover</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-    body { margin: 0; background: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; padding: 15px; min-height: 100vh; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { margin: 0; background: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; padding: 15px; min-height: 100vh; top: 0 !important; }
     .header { width: 100%; max-width: 1050px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
     .title-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     h1 { color: #38bdf8; margin: 0; font-size: 24px; }
     .badge { background: #10b981; color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-    .lang-btn { background: #334155; color: #f8fafc; border: 1px solid #38bdf8; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
-    .lang-btn:hover { background: #0284c7; }
+    
+    /* Tùy chỉnh giao diện nút dịch 100+ ngôn ngữ của Google */
+    .translate-box { background: #1e293b; border: 1px solid #38bdf8; padding: 4px 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px; }
+    .goog-te-gadget { font-size: 0 !important; color: transparent !important; }
+    .goog-te-gadget .goog-te-combo { background: #0f172a; color: #f8fafc; border: 1px solid #475569; padding: 5px 8px; border-radius: 6px; font-size: 13px; font-weight: bold; outline: none; cursor: pointer; margin: 0 !important; }
+    .goog-te-banner-frame.skiptranslate, .VIpgJd-ZVi9od-ORHb-OEVmcd { display: none !important; }
+
     .container { max-width: 1050px; width: 100%; background: #1e293b; padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .upload-box { border: 2px dashed #38bdf8; padding: 25px; text-align: center; border-radius: 12px; cursor: pointer; margin-bottom: 20px; background: #0f172a; transition: 0.2s; }
+    .upload-box { display: block; border: 2px dashed #38bdf8; padding: 25px; text-align: center; border-radius: 12px; cursor: pointer; margin-bottom: 20px; background: #0f172a; transition: 0.2s; }
     .upload-box:hover { background: #172554; }
     .workspace { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
     @media (max-width: 768px) { .workspace { grid-template-columns: 1fr; } }
@@ -26,11 +31,11 @@
     label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; color: #cbd5e1; }
     input[type="range"] { width: 100%; accent-color: #38bdf8; }
     .row { display: flex; gap: 8px; }
-    .row input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #1e293b; color: #fff; font-size: 14px; }
-    .btn-quick { background: #334155; color: #38bdf8; border: 1px solid #475569; padding: 6px; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%; margin-top: 6px; }
+    .row input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #1e293b; color: #fff; font-size: 14px; }.btn-quick { background: #334155; color: #38bdf8; border: 1px solid #475569; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%; margin-top: 6px; }
     button.primary { background: #0284c7; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; width: 100%; }
-    button.record { background: #e11d48; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; }
-    button:disabled { background: #475569; cursor: not-allowed; }#status { text-align: center; margin-top: 10px; color: #fbbf24; font-size: 14px; font-weight: bold; }
+    button.record { background: #e11d48; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; }
+    button:disabled { background: #475569; cursor: not-allowed; }
+    #status { text-align: center; margin-top: 10px; color: #fbbf24; font-size: 14px; font-weight: bold; }
     .footer { max-width: 1050px; width: 100%; text-align: center; margin-top: 25px; font-size: 12px; color: #94a3b8; line-height: 1.6; padding-bottom: 20px; }
   </style>
 </head>
@@ -39,142 +44,88 @@
   <div class="header">
     <div class="title-group">
       <h1>🎬 CutZen Studio</h1>
-      <span class="badge" id="t-badge">Hỗ trợ Video Dài Nhiều Giờ • Toàn Cầu</span>
+      <span class="badge">Hỗ trợ 100+ Ngôn Ngữ • Toàn Cầu</span>
     </div>
-    <button class="lang-btn" id="langToggle" onclick="toggleLanguage()">🌐 English</button>
+    <div class="translate-box">
+      <span>🌐</span>
+      <div id="google_translate_element"></div>
+    </div>
   </div>
 
   <div class="container">
-    <div class="upload-box" onclick="document.getElementById('videoInput').click()">
-      <strong id="t-upload-title">📁 Bấm chọn video từ điện thoại hoặc máy tính (Hỗ trợ file dung lượng lớn)</strong>
-      <p id="t-upload-sub" style="font-size: 12px; color: #94a3b8; margin: 5px 0 0 0;">Xử lý trực tiếp trên thiết bị • Bảo mật 100% • Không lưu trữ đám mây</p>
-      <input type="file" id="videoInput" accept="video/*" style="display: none;">
-    </div>
+    <label for="videoInput" class="upload-box">
+      <strong style="display:block; color:#fff; font-size:15px;">📁 Bấm chọn video từ điện thoại hoặc máy tính (Hỗ trợ mọi dòng máy)</strong>
+      <p style="font-size: 12px; color: #94a3b8; margin: 5px 0 0 0;">Xử lý trực tiếp trên thiết bị • Bảo mật 100% • Không lưu trữ đám mây</p>
+      <input type="file" id="videoInput" accept="video/*,video/mp4,video/quicktime" style="display: none;">
+    </label>
 
     <div class="workspace" id="workspace" style="display: none;">
       <div>
-        <video id="videoPreview" controls playsinline></video>
+        <video id="videoPreview" controls playsinline webkit-playsinline preload="metadata"></video>
         <canvas id="processCanvas"></canvas>
         <div id="status"></div>
       </div>
 
       <div class="controls">
         <div class="group">
-          <h3 id="t-sec1">✂️ 1. Cắt đoạn video (Giờ : Phút : Giây)</h3>
+          <h3>✂️ 1. Cắt đoạn video (Giờ : Phút : Giây)</h3>
           <div class="row">
             <div>
-              <label id="t-start">Bắt đầu (VD: 00:00:00):</label>
+              <label>Bắt đầu (VD: 00:00:00):</label>
               <input type="text" id="startTime" value="00:00:00">
-              <button class="btn-quick" id="t-mark1" onclick="setMarker('start')">📍 Lấy mốc đang phát</button>
+              <button class="btn-quick" type="button" onclick="setMarker('start')">📍 Lấy mốc đang phát</button>
             </div>
             <div>
-              <label id="t-end">Kết thúc (VD: 01:30:00):</label>
+              <label>Kết thúc (VD: 01:30:00):</label>
               <input type="text" id="endTime" value="00:00:10">
-              <button class="btn-quick" id="t-mark2" onclick="setMarker('end')">📍 Lấy mốc đang phát</button>
+              <button class="btn-quick" type="button" onclick="setMarker('end')">📍 Lấy mốc đang phát</button>
             </div>
           </div>
         </div>
 
         <div class="group">
-          <h3 id="t-sec2">🎨 2. Chỉnh màu & Làm đẹp hình ảnh</h3>
-          <label><span id="t-bright">Độ sáng:</span> <span id="valBright">100%</span></label>
-          <input type="range" id="brightness" min="50" max="150" value="100">
-          <label><span id="t-contrast">Độ sắc nét (Tương phản):</span> <span id="valContrast">100%</span></label>
+          <h3>🎨 2. Chỉnh màu & Làm đẹp hình ảnh</h3>
+          <label><span>Độ sáng:</span> <span id="valBright">100%</span></label>
+          <input type="range" id="brightness" min="50" max="150" value="100"><label><span>Độ sắc nét (Tương phản):</span> <span id="valContrast">100%</span></label>
           <input type="range" id="contrast" min="50" max="150" value="100">
-          <label><span id="t-saturate">Độ tươi màu:</span> <span id="valSaturate">100%</span></label>
+          <label><span>Độ tươi màu:</span> <span id="valSaturate">100%</span></label>
           <input type="range" id="saturate" min="0" max="200" value="100">
         </div>
 
         <div class="group" style="border: none;">
-          <h3 id="t-sec3">🎙️ 3. Chỉnh giọng nói & Lồng tiếng</h3><label><span id="t-vol">Âm lượng gốc:</span> <span id="valVol">100%</span></label>
+          <h3>🎙️ 3. Chỉnh giọng nói & Lồng tiếng</h3>
+          <label><span>Âm lượng gốc:</span> <span id="valVol">100%</span></label>
           <input type="range" id="volume" min="0" max="200" value="100">
-          <label><span id="t-pitch">Tông giọng & Tốc độ:</span> <span id="valPitch">1.0x</span></label>
+          <label><span>Tông giọng & Tốc độ:</span> <span id="valPitch">1.0x</span></label>
           <input type="range" id="pitch" min="0.7" max="1.5" step="0.05" value="1.0">
-          <button class="record" id="voiceOverBtn">🎤 Bắt đầu ghi âm lồng tiếng</button>
-          <audio id="voiceAudio" style="display:none;"></audio>
+          <button class="record" id="voiceOverBtn" type="button">🎤 Bắt đầu ghi âm lồng tiếng</button>
+          <audio id="voiceAudio" playsinline style="display:none;"></audio>
         </div>
 
-        <button class="primary" id="exportBtn">⬇️ Xuất & Lưu Video Hoàn Chỉnh</button>
+        <button class="primary" id="exportBtn" type="button">⬇️ Xuất & Lưu Video Hoàn Chỉnh</button>
       </div>
     </div>
   </div>
 
-  <div class="footer" id="t-footer">
+  <div class="footer">
     © 2026 CutZen Studio. Công cụ xử lý video trực tiếp trên thiết bị người dùng.<br>
     Điều khoản & Pháp lý: Người dùng tự chịu trách nhiệm về bản quyền nội dung, hình ảnh, âm thanh sử dụng và cam kết tuân thủ quy định pháp luật hiện hành.
   </div>
 
-  <script>
-    let currentLang = 'vi';
-    const texts = {
-      vi: {
-        btn: '🌐 English',
-        badge: 'Hỗ trợ Video Dài Nhiều Giờ • Toàn Cầu',
-        upTitle: '📁 Bấm chọn video từ điện thoại hoặc máy tính (Hỗ trợ file dung lượng lớn)',
-        upSub: 'Xử lý trực tiếp trên thiết bị • Bảo mật 100% • Không lưu trữ đám mây',
-        sec1: '✂️ 1. Cắt đoạn video (Giờ : Phút : Giây)',
-        start: 'Bắt đầu (VD: 00:00:00):',
-        end: 'Kết thúc (VD: 01:30:00):',
-        mark: '📍 Lấy mốc đang phát',
-        sec2: '🎨 2. Chỉnh màu & Làm đẹp hình ảnh',
-        bright: 'Độ sáng:',
-        contrast: 'Độ sắc nét (Tương phản):',
-        saturate: 'Độ tươi màu:',
-        sec3: '🎙️ 3. Chỉnh giọng nói & Lồng tiếng',
-        vol: 'Âm lượng gốc:',
-        pitch: 'Tông giọng & Tốc độ:',
-        recStart: '🎤 Bắt đầu ghi âm lồng tiếng',
-        recStop: '⏹️ Dừng ghi âm',
-        recAgain: '🎤 Ghi âm lại lồng tiếng',
-        export: '⬇️ Xuất & Lưu Video Hoàn Chỉnh',
-        footer: '© 2026 CutZen Studio. Công cụ xử lý video trực tiếp trên thiết bị người dùng.<br>Điều khoản & Pháp lý: Người dùng tự chịu trách nhiệm về bản quyền nội dung, hình ảnh, âm thanh sử dụng và cam kết tuân thủ quy định pháp luật hiện hành.'
-      },
-      en: {
-        btn: '🌐 Tiếng Việt',
-        badge: 'Multi-Hour Video Support • Global',
-        upTitle: '📁 Click to select video from phone or PC (Large files supported)',
-        upSub: '100% Client-Side Processing • Private & Secure • No Cloud Upload',
-        sec1: '✂️ 1. Trim Video (Hour : Min : Sec)',
-        start: 'Start Time (e.g. 00:00:00):',
-        end: 'End Time (e.g. 01:30:00):',mark: '📍 Set Current Time',
-        sec2: '🎨 2. Color Grading & Video Enhance',
-        bright: 'Brightness:',
-        contrast: 'Contrast (Sharpness):',
-        saturate: 'Saturation:',
-        sec3: '🎙️ 3. Voice Changer & Voiceover',
-        vol: 'Original Volume:',
-        pitch: 'Voice Pitch & Speed:',
-        recStart: '🎤 Start Voiceover Recording',
-        recStop: '⏹️ Stop Recording',
-        recAgain: '🎤 Re-record Voiceover',
-        export: '⬇️ Export & Save Final Video',
-        footer: '© 2026 CutZen Studio. Client-side browser video editing tool.<br>Terms & Legal Disclaimer: Users are solely responsible for the copyright of their uploaded media and agree to comply with all applicable laws.'
-      }
-    };
-
-    function toggleLanguage() {
-      currentLang = currentLang === 'vi' ? 'en' : 'vi';
-      const t = texts[currentLang];
-      document.getElementById('langToggle').innerText = t.btn;
-      document.getElementById('t-badge').innerText = t.badge;
-      document.getElementById('t-upload-title').innerText = t.upTitle;
-      document.getElementById('t-upload-sub').innerText = t.upSub;
-      document.getElementById('t-sec1').innerText = t.sec1;
-      document.getElementById('t-start').innerText = t.start;
-      document.getElementById('t-end').innerText = t.end;
-      document.getElementById('t-mark1').innerText = t.mark;
-      document.getElementById('t-mark2').innerText = t.mark;
-      document.getElementById('t-sec2').innerText = t.sec2;
-      document.getElementById('t-bright').innerText = t.bright;
-      document.getElementById('t-contrast').innerText = t.contrast;document.getElementById('t-saturate').innerText = t.saturate;
-      document.getElementById('t-sec3').innerText = t.sec3;
-      document.getElementById('t-vol').innerText = t.vol;
-      document.getElementById('t-pitch').innerText = t.pitch;
-      document.getElementById('voiceOverBtn').innerText = isRecordingVoice ? t.recStop : (hasVoiceOver ? t.recAgain : t.recStart);
-      document.getElementById('exportBtn').innerText = t.export;
-      document.getElementById('t-footer').innerHTML = t.footer;
+  <!-- Bộ công cụ dịch tự động 100+ ngôn ngữ của Google -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'vi',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
     }
+  </script>
+  <script type="text/javascript" src="https://google.com"></script>
 
+  <!-- Bộ xử lý Video tương thích mọi dòng máy -->
+  <script>
     const videoInput = document.getElementById('videoInput');
     const video = document.getElementById('videoPreview');
     const canvas = document.getElementById('processCanvas');
@@ -191,12 +142,12 @@
     const contrast = document.getElementById('contrast');
     const saturate = document.getElementById('saturate');
     const volume = document.getElementById('volume');
-    const pitch = document.getElementById('pitch');
-
-    let audioCtx, gainNode, sourceNode, destNode, voiceSourceNode;
+    const pitch = document.getElementById('pitch');let audioCtx, gainNode, sourceNode, destNode, voiceSourceNode;
     let mediaRecorderVoice, voiceChunks = [], isRecordingVoice = false, hasVoiceOver = false;
+    let currentVideoUrl = null;
 
     function formatTime(sec) {
+      if (!isFinite(sec) || sec < 0) return '00:00:00';
       const h = Math.floor(sec / 3600).toString().padStart(2, '0');
       const m = Math.floor((sec % 3600) / 60).toString().padStart(2, '0');
       const s = Math.floor(sec % 60).toString().padStart(2, '0');
@@ -205,8 +156,8 @@
 
     function parseTime(str) {
       const parts = str.split(':').map(Number);
-      if (parts.length === 3) return parts * 3600 + parts * 60 + parts;
-      if (parts.length === 2) return parts * 60 + parts;
+      if (parts.length === 3) return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
+      if (parts.length === 2) return (parts[0] || 0) * 60 + (parts[1] || 0);
       return Number(str) || 0;
     }
 
@@ -216,140 +167,153 @@
     }
 
     videoInput.addEventListener('change', (e) => {
-      const file = e.target.files;
+      const file = e.target.files[0];
       if (!file) return;
-      video.src = URL.createObjectURL(file);
-      workspace.style.display = 'grid';
-      video.onloadedmetadata = () => {
-        startInput.value = '00:00:00';
-        endInput.value = formatTime(video.duration);
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-      };
-    });
-
-    function updateFilters() {
-      document.getElementById('valBright').innerText = brightness.value + '%';
-      document.getElementById('valContrast').innerText = contrast.value + '%';document.getElementById('valSaturate').innerText = saturate.value + '%';
-      video.style.filter = `brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%)`;
-
-      document.getElementById('valVol').innerText = volume.value + '%';
-      if (gainNode) gainNode.gain.value = volume.value / 100;
-
-      const p = parseFloat(pitch.value);
-      document.getElementById('valPitch').innerText = `${p}x`;
-      video.playbackRate = p;
-      video.preservesPitch = false;
-    }
-
-    [brightness, contrast, saturate, volume, pitch].forEach(el => el.addEventListener('input', updateFilters));
-
-    voiceOverBtn.addEventListener('click', async () => {
-      const t = texts[currentLang];
-      if (!isRecordingVoice) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorderVoice = new MediaRecorder(stream);
-          voiceChunks = [];
-          mediaRecorderVoice.ondataavailable = e => voiceChunks.push(e.data);
-          mediaRecorderVoice.onstop = () => {
-            const blob = new Blob(voiceChunks, { type: 'audio/webm' });
-            voiceAudio.src = URL.createObjectURL(blob);
-            hasVoiceOver = true;
-            statusText.innerText = currentLang === 'vi' ? '✅ Đã ghi âm lồng tiếng xong! Bấm Xuất Video để lưu.' : '✅ Voiceover saved! Click Export to save video.';
-          };
-          video.currentTime = parseTime(startInput.value);
-          video.muted = true;
-          video.play();
-          mediaRecorderVoice.start();
-          isRecordingVoice = true;
-          voiceOverBtn.innerText = t.recStop;
-          voiceOverBtn.style.background = '#f59e0b';
-        } catch (err) {
-          alert(currentLang === 'vi' ? 'Vui lòng bấm Cho phép sử dụng Micro!' : 'Please allow Microphone access!');
-        }
-      } else {
-        mediaRecorderVoice.stop();
-        video.pause();
-        video.muted = false;
-        isRecordingVoice = false;
-        voiceOverBtn.innerText = t.recAgain;
-        voiceOverBtn.style.background = '#e11d48';
-      }
-    });
-
-    function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        sourceNode = audioCtx.createMediaElementSource(video);
-        gainNode = audioCtx.createGain();
-        destNode = audioCtx.createMediaStreamDestination();
-        sourceNode.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        gainNode.connect(destNode);
-
-        voiceSourceNode = audioCtx.createMediaElementSource(voiceAudio);
-        voiceSourceNode.connect(audioCtx.destination);
-        voiceSourceNode.connect(destNode);
-      }
-      gainNode.gain.value = volume.value / 100;
-    }
-
-    exportBtn.addEventListener('click', () => {
-      const start = parseTime(startInput.value);
-      const end = parseTime(endInput.value);
-      if (start >= end || end > video.duration) {alert(currentLang === 'vi' ? 'Mốc thời gian cắt không hợp lệ!' : 'Invalid trim timestamps!');
-        return;
-      }
-
-      initAudio();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-
-      exportBtn.disabled = true;
-      video.currentTime = start;
-      if (hasVoiceOver) {
-        voiceAudio.currentTime = 0;
-        voiceAudio.play();
-      }
-
-      const canvasStream = canvas.captureStream(30);
-      const combinedStream = new MediaStream([
-        ...canvasStream.getVideoTracks(),
-        ...destNode.stream.getAudioTracks()
-      ]);
-
-      const recorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
-      const chunks = [];
+      if (currentVideoUrl) URL.revokeObjectURL(currentVideoUrl);
+      currentVideoUrl = URL.createObjectURL(file);
       
-      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'CutZen-Studio-Video.webm';
-        a.click();
-        exportBtn.disabled = false;
-        statusText.innerText = currentLang === 'vi' ? '🎉 Hoàn tất! Video đã tự động tải về máy.' : '🎉 Done! Video has been downloaded.';
-      };
-
-      video.play();
-      recorder.start(2000);
-
-      function drawFrame() {
-        if (video.currentTime >= end || video.paused || video.ended) {
-          video.pause();
-          voiceAudio.pause();
-          if (recorder.state === 'recording') recorder.stop();
-          return;
-        }
-        const percent = Math.min(100, Math.round(((video.currentTime - start) / (end - start)) * 100));
-        statusText.innerText = `⏳ ${percent}% (${formatTime(video.currentTime)} / ${formatTime(end)})`;
-        ctx.filter = `brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%)`;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        requestAnimationFrame(drawFrame);
-      }
-      drawFrame();
-    });
-  </script>
-</body>
-</html>
+      workspace.style.display = 'grid';statusText.innerText = '⏳ Đang tải video lên khung hình...';
+video.src = currentVideoUrl;
+video.load();
+video.onloadedmetadata = () => {
+startInput.value = '00:00:00';
+endInput.value = formatTime(video.duration);
+canvas.width = video.videoWidth || 1280;
+canvas.height = video.videoHeight || 720;
+statusText.innerText = '✅ Đã tải video sẵn sàng!';
+};
+});
+function updateFilters() {
+document.getElementById('valBright').innerText = brightness.value + '%';
+document.getElementById('valContrast').innerText = contrast.value + '%';
+document.getElementById('valSaturate').innerText = saturate.value + '%';
+video.style.filter = brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%);
+document.getElementById('valVol').innerText = volume.value + '%';
+if (gainNode) gainNode.gain.value = volume.value / 100;
+const p = parseFloat(pitch.value);
+document.getElementById('valPitch').innerText = ${p}x;
+video.playbackRate = p;
+if ('preservesPitch' in video) video.preservesPitch = false;
+}
+[brightness, contrast, saturate, volume, pitch].forEach(el => el.addEventListener('input', updateFilters));
+function getSupportedAudioType() {
+const types = ['audio/mp4', 'audio/webm', 'audio/ogg', ''];
+for (let t of types) {
+if (!t || (window.MediaRecorder && MediaRecorder.isTypeSupported(t))) return t;
+}
+return '';
+}
+function getSupportedVideoType() {
+const types = ['video/mp4', 'video/webm;codecs=vp8,opus', 'video/webm', ''];
+for (let t of types) {
+if (!t || (window.MediaRecorder && MediaRecorder.isTypeSupported(t))) return t;
+}
+return '';
+}
+voiceOverBtn.addEventListener('click', async () => {
+if (!isRecordingVoice) {
+try {
+const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+const mime = getSupportedAudioType();
+mediaRecorderVoice = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+voiceChunks = [];
+mediaRecorderVoice.ondataavailable = e => { if (e.data && e.data.size > 0) voiceChunks.push(e.data); };
+mediaRecorderVoice.onstop = () => {
+const blob = new Blob(voiceChunks, { type: mime || 'audio/mp4' });
+voiceAudio.src = URL.createObjectURL(blob);
+hasVoiceOver = true;
+stream.getTracks().forEach(track => track.stop());
+statusText.innerText = '✅ Đã ghi âm lồng tiếng xong! Bấm Xuất Video để lưu.';
+};
+video.currentTime = parseTime(startInput.value);
+video.muted = true;
+await video.play();
+mediaRecorderVoice.start();
+isRecordingVoice = true;
+voiceOverBtn.innerText = '⏹️ Dừng ghi âm';
+voiceOverBtn.style.background = '#f59e0b';
+} catch (err) {
+alert('Thiết bị chưa cấp quyền Micro hoặc trình duyệt không hỗ trợ ghi âm!');
+}
+} else {
+mediaRecorderVoice.stop();
+video.pause();
+video.muted = false;
+isRecordingVoice = false;
+voiceOverBtn.innerText = '🎤 Ghi âm lại lồng tiếng';
+voiceOverBtn.style.background = '#e11d48';
+}
+});
+function initAudio() {
+if (!audioCtx) {
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;audioCtx = new AudioContextClass();
+sourceNode = audioCtx.createMediaElementSource(video);
+gainNode = audioCtx.createGain();
+destNode = audioCtx.createMediaStreamDestination();
+sourceNode.connect(gainNode);
+gainNode.connect(audioCtx.destination);
+gainNode.connect(destNode);
+voiceSourceNode = audioCtx.createMediaElementSource(voiceAudio);
+voiceSourceNode.connect(audioCtx.destination);
+voiceSourceNode.connect(destNode);
+}
+gainNode.gain.value = volume.value / 100;
+}
+exportBtn.addEventListener('click', async () => {
+const start = parseTime(startInput.value);
+const end = parseTime(endInput.value);
+if (start >= end || end > video.duration + 0.5) {
+alert('Mốc thời gian cắt không hợp lệ!');
+return;
+}
+if (!window.MediaRecorder || !canvas.captureStream) {
+alert('Trình duyệt trên máy quá cũ chưa hỗ trợ xuất video trực tiếp. Vui lòng cập nhật Chrome hoặc Safari mới nhất!');
+return;
+}
+initAudio();
+if (audioCtx.state === 'suspended') await audioCtx.resume();
+exportBtn.disabled = true;
+video.currentTime = start;
+if (hasVoiceOver) {
+voiceAudio.currentTime = 0;
+voiceAudio.play();
+}
+const canvasStream = canvas.captureStream(30);
+const combinedStream = new MediaStream([
+...canvasStream.getVideoTracks(),
+...destNode.stream.getAudioTracks()
+]);
+const videoMime = getSupportedVideoType();
+const fileExt = videoMime.includes('mp4') ? 'mp4' : 'webm';
+const recorder = videoMime ? new MediaRecorder(combinedStream, { mimeType: videoMime }) : new MediaRecorder(combinedStream);
+const chunks = [];
+recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+recorder.onstop = () => {
+const blob = new Blob(chunks, { type: videoMime || 'video/mp4' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = CutZen-Studio-Video.${fileExt};
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+exportBtn.disabled = false;
+statusText.innerText = '🎉 Hoàn tất! Video đã tự động lưu về máy.';
+};
+await video.play();
+recorder.start(1000);
+function drawFrame() {
+if (video.currentTime >= end || video.paused || video.ended) {
+video.pause();
+voiceAudio.pause();
+if (recorder.state === 'recording') recorder.stop();
+return;
+}
+const percent = Math.min(100, Math.round(((video.currentTime - start) / (end - start)) * 100));
+statusText.innerText = ⏳ ${percent}% (${formatTime(video.currentTime)} / ${formatTime(end)});
+ctx.filter = brightness(${brightness.value}%) contrast(${contrast.value}%) saturate(${saturate.value}%);
+ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+requestAnimationFrame(drawFrame);
+}
+drawFrame();
+});
