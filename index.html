@@ -225,15 +225,14 @@
       }, 'google_translate_element');
     }
   </script>
-  <script type="text/javascript" src="https://google.com"></script>
 <script>
-</script>
-      document.getElementById('sectionVideo').style.display = mode === 'video' ? 'block' : 'none';
-      document.getElementById('sectionPhoto').style.display = mode === 'photo' ? 'block' : 'none';
-      document.getElementById('tabVideo').classList.toggle('active', mode === 'video');
-      document.getElementById('tabPhoto').classList.toggle('active', mode === 'photo');
-    }
-
+  function setMode(mode) {
+    document.getElementById('sectionVideo').style.display = mode === 'video' ? 'block' : 'none';
+    document.getElementById('sectionPhoto').style.display = mode === 'photo' ? 'block' : 'none';
+    document.getElementById('tabVideo').classList.toggle('active', mode === 'video');
+    document.getElementById('tabPhoto').classList.toggle('active', mode === 'photo');
+  }
+      
     function getSupportedVideoType() {
       const types = ['video/mp4', 'video/webm;codecs=vp8,opus', 'video/webm', ''];
       for (let t of types) {
@@ -288,18 +287,20 @@
       return Number(str) || 0;
     }
 
-    function setMarker(type) {
-      if (type === 'start') startInput.value = formatTime(video.currentTime);
-      if (type === 'end') endInput.value = formatTime(video.currentTime);
-    }videoInput.addEventListener('change', (e) => {
-      const file = e.target.files.item(0);
-      if (!file) return;
-      if (currentVideoUrl) URL.revokeObjectURL(currentVideoUrl);
-      currentVideoUrl = URL.createObjectURL(file);
-      workspace.style.display = 'grid';
-      statusText.innerText = '⏳ Đang tải video lên khung hình...';
-      video.src = currentVideoUrl;
-      video.load();
+  function setMarker(type) {
+  if (type === 'start') startInput.value = formatTime(video.currentTime);
+  if (type === 'end') endInput.value = formatTime(video.currentTime);
+}
+
+videoInput.addEventListener('change', (e) => {
+  const file = e.target.files.item(0);
+  if (!file) return;
+  if (currentVideoUrl) URL.revokeObjectURL(currentVideoUrl);
+  currentVideoUrl = URL.createObjectURL(file);
+  workspace.style.display = 'grid';
+  statusText.innerText = '⏳ Đang tải video lên khung hình...';
+  video.src = currentVideoUrl;
+  video.load();
       video.onloadedmetadata = () => {
         startInput.value = '00:00:00';
         endInput.value = formatTime(video.duration);
@@ -645,266 +646,47 @@
       const chunks = [];
 
       recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = () => {
-        if (hasMusic) bgMusicPlayer.pause();
-        if (hasPhotoVoice) photoVoicePlayer.pause();
-        const blob = new Blob(chunks, { type: videoMime || 'video/mp4' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
+     recorder.onstop = () => {
+      if (hasMusic) bgMusicPlayer.pause();
+      if (hasPhotoVoice) photoVoicePlayer.pause();
+      const blob = new Blob(chunks, { type: videoMime || 'video/mp4' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CutZen-Animated-Video.${fileExt}`;
+      a.click();
+      URL.revokeObjectURL(url);
 
-'a.download = 'CutZen-Animated-Video.${fileExt};// ================= PHẦN 2: GHÉP HÌNH ẢNH ĐỘNG + NHẠC + GHI ÂM MICRO =================
-    const imageFilesInput = document.getElementById('imageFilesInput');
-    const musicFileInput = document.getElementById('musicFileInput');
-    const overlayInput = document.getElementById('overlayInput');
-    const bgMusicPlayer = document.getElementById('bgMusicPlayer');
-    const photoVoiceBtn = document.getElementById('photoVoiceBtn');
-    const photoVoicePlayer = document.getElementById('photoVoicePlayer');
-    const photoCanvas = document.getElementById('photoCanvas');
-    const pCtx = photoCanvas.getContext('2d');
-    const photoStatus = document.getElementById('photoStatus');
-    const thumbList = document.getElementById('thumbList');
-    const exportPhotoBtn = document.getElementById('exportPhotoBtn');
+      exportPhotoBtn.disabled = false;
+      photoStatus.innerText = '✅ Đã tạo và tải video từ hình ảnh thành công!';
+    };
 
-    let loadedImages = [];
-    let overlayImage = null;
-    let hasMusic = false;
-    let hasPhotoVoice = false;
-    let isRecordingPhotoVoice = false;
-    let photoVoiceRecorder, photoVoiceChunks = [], photoPreviewTimer = null;
-    let photoAudioCtx, photoMusicSource, photoVoiceSource, photoAudioDest;
+    recorder.start(1000);
+    const startTime = performance.now();
 
-    function getPhotoFilterString() {
-      const c = document.getElementById('photoContrast').value;
-      const tone = document.getElementById('colorTone').value;
-      let toneFilter = '';
-      if (tone === 'vivid') toneFilter = 'saturate(155%) brightness(105%)';
-      else if (tone === 'bw') toneFilter = 'grayscale(100%)';
-      else if (tone === 'sepia') toneFilter = 'sepia(85%)';
-      else if (tone === 'cool') toneFilter = 'hue-rotate(180deg) saturate(115%)';
-      else if (tone === 'warm') toneFilter = 'sepia(35%) saturate(135%)';
-      return `contrast(${c}%) ${toneFilter}`.trim();
-    }
-
-    function drawPhotoScene(img, zoomFactor = 1.0) {
-      if (!img) return;
-      pCtx.save();
-      pCtx.fillStyle = '#000';
-      pCtx.fillRect(0, 0, photoCanvas.width, photoCanvas.height);
-      pCtx.filter = getPhotoFilterString();
-
-      const baseScale = Math.min(photoCanvas.width / img.width, photoCanvas.height / img.height);
-      const scale = baseScale * zoomFactor;
-      const drawW = img.width * scale;
-      const drawH = img.height * scale;
-      const x = (photoCanvas.width - drawW) / 2;
-      const y = (photoCanvas.height - drawH) / 2;
-      pCtx.drawImage(img, x, y, drawW, drawH);
-
-      if (overlayImage && overlayImage.width > 0) {
-        const scalePct = Number(document.getElementById('overlayScale').value) / 100;
-        const pos = document.getElementById('overlayPos').value;
-        const ovH = photoCanvas.height * scalePct;
-        const ovW = overlayImage.width * (ovH / overlayImage.height);
-        let ovX = (photoCanvas.width - ovW) / 2;
-        if (pos === 'left') ovX = photoCanvas.width * 0.05;
-        else if (pos === 'right') ovX = photoCanvas.width - ovW - (photoCanvas.width * 0.05);
-        const ovY = photoCanvas.height - ovH;
-        pCtx.drawImage(overlayImage, ovX, ovY, ovW, ovH);
-      }pCtx.restore();
-    }
-
-    function refreshPhotoPreview() {
-      if (loadedImages.length > 0) drawPhotoScene(loadedImages.at(0), 1.0);
-    }
-
-    function updatePhotoCanvasSize() {
-      const [w, h] = document.getElementById('aspectRatio').value.split('x').map(Number);
-      photoCanvas.width = w;
-      photoCanvas.height = h;
-      refreshPhotoPreview();
-    }
-
-    imageFilesInput.addEventListener('change', async (e) => {
-      const files = Array.from(e.target.files);
-      if (!files.length) return;
-      loadedImages = [];
-      thumbList.innerHTML = '';
-      photoStatus.innerText = '⏳ Đang tải hình ảnh...';
-
-      for (const file of files) {
-        const url = URL.createObjectURL(file);
-        const img = new Image();
-        img.src = url;
-        await new Promise(res => { img.onload = res; img.onerror = res; });
-        if (img.width > 0) {
-          loadedImages.push(img);
-          const thumb = document.createElement('img');
-          thumb.src = url;
-          thumbList.appendChild(thumb);
-        }
-      }
-
-      document.getElementById('imgCountText').innerText = `✅ Đã chọn ${loadedImages.length} ảnh nền`;
-      if (loadedImages.length > 0) {
-        refreshPhotoPreview();
-        photoStatus.innerText = '✅ Ảnh đã sẵn sàng! Có thể ghi âm lồng tiếng hoặc bấm Tạo Video.';
-      }
-    });
-
-    overlayInput.addEventListener('change', async (e) => {
-      const file = e.target.files.item(0);
-      if (!file) return;
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      await new Promise(res => { img.onload = res; img.onerror = res; });
-      if (img.width > 0) {
-        overlayImage = img;
-        document.getElementById('overlayNameText').innerText = `✅ Nhân vật: ${file.name}`;
-        refreshPhotoPreview();
-      }
-    });
-
-    musicFileInput.addEventListener('change', (e) => {
-      const file = e.target.files.item(0);
-      if (!file) return;
-      bgMusicPlayer.src = URL.createObjectURL(file);
-      hasMusic = true;
-      document.getElementById('musicNameText').innerText = `✅ Nhạc nền: ${file.name}`;
-    });
-
-    photoVoiceBtn.addEventListener('click', async () => {
-      if (!isRecordingPhotoVoice) {
-        if (loadedImages.length === 0) {
-          alert('Vui lòng chọn ít nhất 1 ảnh nền trước để nhìn ảnh khi ghi âm lồng tiếng!');
-          return;
-        }
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          const mime = getSupportedAudioType();
-          photoVoiceRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
-          photoVoiceChunks = [];
-          photoVoiceRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) photoVoiceChunks.push(e.data); };
-          photoVoiceRecorder.onstop = () => {
-            const blob = new Blob(photoVoiceChunks, { type: mime || 'audio/mp4' });photoVoicePlayer.src = URL.createObjectURL(blob);
-            hasPhotoVoice = true;
-            stream.getTracks().forEach(track => track.stop());
-            clearInterval(photoPreviewTimer);
-            refreshPhotoPreview();
-            document.getElementById('photoVoiceStatus').innerText = '✅ Đã lưu bản ghi âm lồng tiếng!';
-            photoStatus.innerText = '✅ Ghi âm xong! Bấm Tạo & Xuất Video để ghép hoàn chỉnh.';
-          };
-
-          photoVoiceRecorder.start();
-          isRecordingPhotoVoice = true;
-          photoVoiceBtn.innerText = '⏹️ Dừng ghi âm lồng tiếng';
-          photoVoiceBtn.style.background = '#f59e0b';
-          photoStatus.innerText = '🎙️ Đang thu âm qua Micro... Hãy nói lời thuyết minh!';
-
-          const secPerImg = Number(document.getElementById('secPerImg').value) || 4;
-          let previewIdx = 0;
-          drawPhotoScene(loadedImages.at(0), 1.0);
-          photoPreviewTimer = setInterval(() => {
-            previewIdx = (previewIdx + 1) % loadedImages.length;
-            drawPhotoScene(loadedImages.at(previewIdx), 1.0);
-          }, secPerImg * 1000);
-
-        } catch (err) {
-          alert('Thiết bị chưa cấp quyền Micro hoặc trình duyệt không hỗ trợ ghi âm!');
-        }
-      } else {
-        photoVoiceRecorder.stop();
-        isRecordingPhotoVoice = false;
-        photoVoiceBtn.innerText = '🎤 Ghi âm lại lồng tiếng (Micro)';
-        photoVoiceBtn.style.background = '#e11d48';
-      }
-    });
-
-    exportPhotoBtn.addEventListener('click', async () => {
-      if (loadedImages.length === 0) {
-        alert('Vui lòng chọn ít nhất 1 ảnh nền trước khi tạo video!');
-        return;
-      }
-      if (!window.MediaRecorder || !photoCanvas.captureStream) {
-        alert('Trình duyệt trên máy quá cũ chưa hỗ trợ xuất video trực tiếp.');
+    function renderSlideshow(now) {
+      const elapsed = now - startTime;
+      if (elapsed >= totalDurationMs) {
+        if (recorder.state !== 'inactive') recorder.stop();
         return;
       }
 
-      const secPerImg = Number(document.getElementById('secPerImg').value) || 4;
-      const motion = document.getElementById('motionEffect').value;
-      const totalDurationMs = loadedImages.length * secPerImg * 1000;
+      const imgIndex = Math.min(
+        Math.floor(elapsed / (secPerImg * 1000)),
+        loadedImages.length - 1
+      );
+      const progressInSlide = (elapsed % (secPerImg * 1000)) / (secPerImg * 1000);
 
-      exportPhotoBtn.disabled = true;
-      const tracks = [...photoCanvas.captureStream(30).getVideoTracks()];
+      let zoom = 1.0;
+      if (motion === 'zoomIn') zoom = 1.0 + progressInSlide * 0.15;
+      else if (motion === 'zoomOut') zoom = 1.15 - progressInSlide * 0.15;
 
-      if (hasMusic || hasPhotoVoice) {
-        if (!photoAudioCtx) {
-          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-          photoAudioCtx = new AudioContextClass();
-          photoAudioDest = photoAudioCtx.createMediaStreamDestination();
+      drawPhotoScene(loadedImages.at(imgIndex), zoom);
+      requestAnimationFrame(renderSlideshow);
+    }
 
-          photoMusicSource = photoAudioCtx.createMediaElementSource(bgMusicPlayer);
-          photoMusicSource.connect(photoAudioCtx.destination);
-          photoMusicSource.connect(photoAudioDest);
-
-          photoVoiceSource = photoAudioCtx.createMediaElementSource(photoVoicePlayer);
-          photoVoiceSource.connect(photoAudioCtx.destination);
-          photoVoiceSource.connect(photoAudioDest);
-        }if (photoAudioCtx.state === 'suspended') await photoAudioCtx.resume();
-
-        if (hasMusic) {
-          bgMusicPlayer.currentTime = 0;
-          bgMusicPlayer.loop = true;
-          bgMusicPlayer.volume = hasPhotoVoice ? 0.35 : 1.0;
-          await bgMusicPlayer.play();
-        }
-        if (hasPhotoVoice) {
-          photoVoicePlayer.currentTime = 0;
-          await photoVoicePlayer.play();
-        }
-        tracks.push(...photoAudioDest.stream.getAudioTracks());
-      }
-
-      const combinedStream = new MediaStream(tracks);
-      const videoMime = getSupportedVideoType();
-      const fileExt = videoMime.includes('mp4') ? 'mp4' : 'webm';
-      const recorder = videoMime ? new MediaRecorder(combinedStream, { mimeType: videoMime }) : new MediaRecorder(combinedStream);
-      const chunks = [];
-
-      recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = () => {
-        if (hasMusic) bgMusicPlayer.pause();
-        if (hasPhotoVoice) photoVoicePlayer.pause();
-        const blob = new Blob(chunks, { type: videoMime || 'video/mp4' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-
-a.download = CutZen-Animated-Video.${fileExt};document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-exportPhotoBtn.disabled = false;
-photoStatus.innerText = '🎉 Hoàn tất! Video hiệu ứng động đã tự động lưu về máy.';
-};
-recorder.start(1000);
-const startTime = performance.now();
-function renderSlideshow(now) {
-const elapsed = now - startTime;
-if (elapsed >= totalDurationMs) {
-if (recorder.state === 'recording') recorder.stop();
-return;
-}
-const imgDurationMs = secPerImg * 1000;
-const imgIndex = Math.min(loadedImages.length - 1, Math.floor(elapsed / imgDurationMs));
-const progressInImg = (elapsed % imgDurationMs) / imgDurationMs;
-let zoom = 1.0;
-if (motion === 'zoomIn') zoom = 1.0 + (0.18 * progressInImg);
-else if (motion === 'zoomOut') zoom = 1.18 - (0.18 * progressInImg);
-drawPhotoScene(loadedImages.at(imgIndex), zoom);
-const percent = Math.min(100, Math.round((elapsed / totalDurationMs) * 100));
-photoStatus.innerText = ⏳ Đang tạo cảnh ${imgIndex + 1}/${loadedImages.length} (${percent}%)...;
-requestAnimationFrame(renderSlideshow);
-}
-requestAnimationFrame(renderSlideshow);
-});
-  
+    requestAnimationFrame(renderSlideshow);
+  });
+</script>
+</body>
+</html>
