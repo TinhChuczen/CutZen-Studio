@@ -57,10 +57,13 @@
     </div>
   </div>
 
-  <div class="mode-tabs">
-    <button class="tab-btn active" id="tabVideo" type="button" onclick="switchMode('video')">🎬 1. Sửa Video Có Sẵn</button>
-    <button class="tab-btn" id="tabPhoto" type="button" onclick="switchMode('photo')">🖼️ 2. Ghép Ảnh Động + Nhạc</button>
-  </div>
+ <div class="mode-tabs">
+  <button class="tab-btn active" id="tabVideo" type="button" onclick="setMode('video')">🎬 1. Sửa Video Có Sẵn</button>
+  <button class="tab-btn" id="tabPhoto" type="button" onclick="setMode('photo')">🖼️ 2. Ghép Ảnh Động + Nhạc</button>
+</div>
+<div style="max-width: 1050px; width: 100%; background: rgba(56, 189, 248, 0.12); border: 1px solid #38bdf8; color: #e2e8f0; padding: 10px 15px; border-radius: 10px; font-size: 13px; text-align: center; margin-bottom: 15px;">
+  🎁 <strong>Phiên bản Cộng đồng Miễn phí 100%:</strong> Hiện tại toàn bộ tính năng chỉnh sửa video và tạo video từ ảnh được mở miễn phí không giới hạn để phục vụ cộng đồng trải nghiệm. Các gói tính năng nâng cao (Pro) sẽ được cập nhật trong tương lai.
+</div>
 
   <!-- CHẾ ĐỘ 1: SỬA VIDEO CÓ SẴN -->
   <div class="container" id="sectionVideo">
@@ -151,27 +154,26 @@
           <h3>🧍 2. Chèn ảnh nhân vật / Lớp phủ (Tùy chọn)</h3> ✨ Chọn 1 ảnh nhân vật (PNG tách nền)đè lên cảnh
             <input type="file" id="overlayInput" accept="image/*" style="display:none;">
           </label>
-          <div id="overlayNameText" style="font-size:12px; color:#fbbf24; margin-top:4px;">Không có ảnh nhân vật đè lên</div>
-          <div class="row" style="margin-top:6px;">
-            <div style="flex:1;">
-              <label>Vị trí nhân vật:</label>
-              <select id="overlayPos" onchange="refreshPhotoPreview()">
-                <option value="center">Ở giữa cảnh</option>
-                <option value="left">Góc bên trái</option>
-                <option value="right">Góc bên phải</option>
-              </select>
-            </div>
-            <div style="flex:1;">
-              <label><span>Cỡ ảnh:</span> <span id="valOverlayScale">50%</span></label>
-              <input type="range" id="overlayScale" min="20" max="100" value="50" oninput="document.getElementById('valOverlayScale').innerText = this.value + '%'; refreshPhotoPreview();">
-            </div>
-          </div>
-        </div>
+         <div id="overlayNameText" style="font-size:12px; color:#fbbf24; margin-top:4px;">Không có ảnh nhân vật đè lên</div>
+<div class="row" style="margin-top:8px;">
+  <div style="flex:1;">
+    <label>Vị trí nhân vật:</label>
+    <select id="overlayPos" onchange="refreshPhotoPreview()">
+      <option value="center">Ở giữa cảnh</option>
+      <option value="left">Góc bên trái</option>
+      <option value="right">Góc bên phải</option>
+    </select>
+  </div>
+  <div style="flex:1;">
+    <label><span>Cỡ ảnh:</span> <span id="valOverlayScale">50%</span></label>
+    <input type="range" id="overlayScale" min="20" max="100" value="50" oninput="document.getElementById('valOverlayScale').innerText = this.value + '%'; refreshPhotoPreview();">
+  </div>
+</div>
 
-        <div class="group">
-          <h3>🎨 3. Chuyển động & Làm đậm / Đổi tông màu</h3>
-          <div class="row">
-            <div style="flex:1;">
+<div class="group">
+  <h3>🎨 3. Chuyển động & Làm đậm / Đổi tông màu</h3>
+  <div class="row">
+    <div style="flex:1;">
               <label>Hiệu ứng chuyển động:</label>
               <select id="motionEffect">
                 <option value="zoomIn">🔍 Phóng to dần (Động)</option>
