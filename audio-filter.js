@@ -95,7 +95,8 @@
       document.querySelectorAll('audio, video').forEach(applyVoiceFilter);
     }, 1000);
   });
-})();(function () {
+)();
+(function () {
   // 1. Tự động mở khóa mọi ô chọn tệp để nhận tất cả định dạng & nhiều file
   function unlockAllInputs() {
     document.querySelectorAll('input[type="file"]').forEach(function (inp) {
