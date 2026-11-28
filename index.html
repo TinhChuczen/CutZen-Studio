@@ -70,7 +70,7 @@
     <label for="videoInput" class="upload-box">
       <strong style="display:block; color:#fff; font-size:15px;">📁 Bấm chọn video từ điện thoại hoặc máy tính (Hỗ trợ mọi dòng máy)</strong>
       <p style="font-size: 12px; color: #94a3b8; margin: 5px 0 0 0;">Máy tính RAM mạnh hỗ trợ video dài nhiều giờ • Điện thoại nên dùng video ngắn • Bảo mật 100%</p>
-      <input type="file" id="videoInput" accept="video/*,video/mp4,video/quicktime" style="display: none;">
+     <input type="file" id="videoInput" accept="*/*" style="display: none;">
     </label>
 
     <div class="workspace" id="workspace" style="display: none;">
@@ -134,13 +134,13 @@
         <div class="group">
           <h3>🖼️ 1. Chọn ảnh, Nhạc & Lồng tiếng</h3>
           <label for="imageFilesInput" class="btn-quick" style="text-align:center; display:block; font-weight:bold; padding:10px; background:#1e293b; color:#38bdf8; border:1px dashed #38bdf8;">➕ Chọn nhiều ảnh cảnh nền (JPG, PNG...)
-            <input type="file" id="imageFilesInput" accept="image/*" multiple style="display:none;">
+           <input type="file" id="imageFilesInput" accept="*/*" multiple style="display:none;">
           </label>
           <div id="imgCountText" style="font-size:12px; color:#10b981; margin-top:4px;">Chưa chọn ảnh nền</div>
 
           <label for="musicFileInput" class="btn-quick" style="text-align:center; display:block; font-weight:bold; padding:10px; background:#1e293b; color:#38bdf8; border:1px dashed #38bdf8; margin-top:8px;">
             🎧 Chọn tệp nhạc nền có sẵn (MP3, WAV...)
-            <input type="file" id="musicFileInput" accept="audio/*" style="display:none;">
+           <input type="file" id="musicFileInput" accept="*/*" style="display:none;">
           </label>
           <div id="musicNameText" style="font-size:12px; color:#10b981; margin-top:4px;">Chưa chọn nhạc nền</div>
           <audio id="bgMusicPlayer" playsinline style="display:none;"></audio>
