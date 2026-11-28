@@ -76,7 +76,8 @@
     });
   }
 
-  // 3. Tự động gắn bảng chọn tông giọng & áp dụng cho mọi âm thanh/videowindow.addEventListener('DOMContentLoaded', function () {
+  // 3. Tự động gắn bảng chọn tông giọng & áp dụng cho mọi âm thanh/video
+  window.addEventListener('DOMContentLoaded', function () {
     const bar = document.createElement('div');
     bar.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:9999;background:#1e293b;color:#fff;padding:8px 12px;border-radius:10px;border:1px solid #38bdf8;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,0.4);';
     bar.innerHTML = '🎙️ Lọc hơi thở & Giọng: ' +
